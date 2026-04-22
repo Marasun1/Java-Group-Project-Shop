@@ -1,0 +1,208 @@
+package com.store.controller;
+
+import com.store.model.Product;
+import com.store.service.ProductService;
+import com.store.util.AlertUtil;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.fxml.FXML;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
+
+public class MainController {
+
+    @FXML
+    private TableView<Product> productTable;
+
+    @FXML
+    private TableColumn<Product, Long> idColumn;
+
+    @FXML
+    private TableColumn<Product, String> skuColumn;
+
+    @FXML
+    private TableColumn<Product, String> nameColumn;
+
+    @FXML
+    private TableColumn<Product, String> descriptionColumn;
+
+    @FXML
+    private TableColumn<Product, LocalDateTime> createdAtColumn;
+
+    @FXML
+    private TableColumn<Product, LocalDateTime> updatedAtColumn;
+
+    @FXML
+    private TextField skuField;
+
+    @FXML
+    private TextField nameField;
+
+    @FXML
+    private TextArea descriptionArea;
+
+    @FXML
+    private Label statusLabel;
+
+    private final ProductService productService = new ProductService();
+    private final ObservableList<Product> productList = FXCollections.observableArrayList();
+    private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+
+    private Long editingProductId = null;
+
+    @FXML
+    private void initialize() {
+        idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
+        skuColumn.setCellValueFactory(new PropertyValueFactory<>("sku"));
+        nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
+        createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
+        updatedAtColumn.setCellValueFactory(new PropertyValueFactory<>("updatedAt"));
+
+        configureDateColumn(createdAtColumn);
+        configureDateColumn(updatedAtColumn);
+
+        productTable.setItems(productList);
+
+        productTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, selectedProduct) -> {
+            if (selectedProduct != null) {
+                fillForm(selectedProduct);
+            }
+        });
+
+        setStatus("Інтерфейс завантажено. Натисни «Оновити», щоб отримати товари з БД.");
+    }
+
+    private void configureDateColumn(TableColumn<Product, LocalDateTime> column) {
+        column.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+
+                if (empty || item == null) {
+                    setText(null);
+                } else {
+                    setText(item.format(formatter));
+                }
+            }
+        });
+    }
+
+    @FXML
+    private void handleSave() {
+        String sku = skuField.getText() != null ? skuField.getText().trim() : "";
+        String name = nameField.getText() != null ? nameField.getText().trim() : "";
+        String description = descriptionArea.getText() != null ? descriptionArea.getText().trim() : "";
+
+        if (sku.isBlank() || name.isBlank()) {
+            AlertUtil.showWarning("Перевірка", "Поля SKU і Назва є обов’язковими.");
+            return;
+        }
+
+        try {
+            if (editingProductId == null) {
+                Product newProduct = new Product(sku, name, description);
+                productService.createProduct(newProduct);
+                AlertUtil.showInfo("Успіх", "Товар успішно додано.");
+            } else {
+                Product updatedProduct = new Product();
+                updatedProduct.setId(editingProductId);
+                updatedProduct.setSku(sku);
+                updatedProduct.setName(name);
+                updatedProduct.setDescription(description);
+
+                boolean updated = productService.updateProduct(updatedProduct);
+
+                if (updated) {
+                    AlertUtil.showInfo("Успіх", "Товар успішно оновлено.");
+                } else {
+                    AlertUtil.showWarning("Увага", "Не вдалося оновити товар.");
+                }
+            }
+
+            loadProducts();
+            clearForm();
+        } catch (Exception e) {
+            AlertUtil.showError("Помилка збереження", e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleDelete() {
+        Product selectedProduct = productTable.getSelectionModel().getSelectedItem();
+
+        if (selectedProduct == null) {
+            AlertUtil.showWarning("Видалення", "Спочатку вибери товар у таблиці.");
+            return;
+        }
+
+        boolean confirmed = AlertUtil.showConfirmation(
+                "Підтвердження",
+                "Ти справді хочеш видалити товар: " + selectedProduct.getName() + "?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            boolean deleted = productService.deleteProduct(selectedProduct.getId());
+
+            if (deleted) {
+                AlertUtil.showInfo("Успіх", "Товар видалено.");
+                loadProducts();
+                clearForm();
+            } else {
+                AlertUtil.showWarning("Увага", "Не вдалося видалити товар.");
+            }
+        } catch (Exception e) {
+            AlertUtil.showError("Помилка видалення", e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleRefresh() {
+        loadProducts();
+    }
+
+    @FXML
+    private void handleClear() {
+        clearForm();
+    }
+
+    private void fillForm(Product product) {
+        editingProductId = product.getId();
+        skuField.setText(product.getSku());
+        nameField.setText(product.getName());
+        descriptionArea.setText(product.getDescription());
+        setStatus("Режим: редагування товару ID = " + product.getId());
+    }
+
+    private void clearForm() {
+        editingProductId = null;
+        skuField.clear();
+        nameField.clear();
+        descriptionArea.clear();
+        productTable.getSelectionModel().clearSelection();
+        setStatus("Режим: додавання нового товару");
+    }
+
+    private void loadProducts() {
+        try {
+            List<Product> products = productService.getAllProducts();
+            productList.setAll(products);
+            setStatus("Завантажено товарів: " + products.size());
+        } catch (Exception e) {
+            AlertUtil.showError("Помилка завантаження", e.getMessage());
+            setStatus("Помилка завантаження даних.");
+        }
+    }
+
+    private void setStatus(String message) {
+        statusLabel.setText(message);
+    }
+}
