@@ -22,6 +22,14 @@ public class ProductService {
             WHERE id = ?
             """;
 
+    private static final String SEARCH_SQL = """
+            SELECT id, sku, name, description, created_at, updated_at
+            FROM products
+            WHERE (? IS NULL OR sku ILIKE ?)
+              AND (? IS NULL OR name ILIKE ?)
+            ORDER BY id
+            """;
+
     private static final String INSERT_SQL = """
             INSERT INTO products (sku, name, description, created_at, updated_at)
             VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
@@ -71,6 +79,31 @@ public class ProductService {
             return Optional.empty();
         } catch (SQLException e) {
             throw new RuntimeException("Не вдалося отримати товар за ID.", e);
+        }
+    }
+
+    public List<Product> searchProducts(String sku, String name) {
+        List<Product> products = new ArrayList<>();
+        String skuFilter = normalizeFilter(sku);
+        String nameFilter = normalizeFilter(name);
+
+        try (Connection connection = DatabaseService.getConnection();
+             PreparedStatement statement = connection.prepareStatement(SEARCH_SQL)) {
+
+            statement.setString(1, skuFilter);
+            statement.setString(2, skuFilter);
+            statement.setString(3, nameFilter);
+            statement.setString(4, nameFilter);
+
+            try (ResultSet resultSet = statement.executeQuery()) {
+                while (resultSet.next()) {
+                    products.add(mapProduct(resultSet));
+                }
+            }
+
+            return products;
+        } catch (SQLException e) {
+            throw new RuntimeException("Не вдалося виконати пошук товарів.", e);
         }
     }
 
@@ -131,6 +164,11 @@ public class ProductService {
         product.setCreatedAt(toLocalDateTime(resultSet.getTimestamp("created_at")));
         product.setUpdatedAt(toLocalDateTime(resultSet.getTimestamp("updated_at")));
         return product;
+    }
+
+    private String normalizeFilter(String value) {
+        String trimmed = value != null ? value.trim() : "";
+        return trimmed.isBlank() ? null : "%" + trimmed + "%";
     }
 
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {

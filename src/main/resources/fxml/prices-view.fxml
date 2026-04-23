@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16" styleClass="content-area"
+      xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.store.controller.PricesController">
+    <padding>
+        <Insets top="18" right="18" bottom="18" left="18"/>
+    </padding>
+
+    <children>
+        <HBox spacing="12">
+            <children>
+                <Label text="Ціни" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Оновити" onAction="#handleRefresh" styleClass="secondary-button"/>
+            </children>
+        </HBox>
+
+        <SplitPane dividerPositions="0.68" VBox.vgrow="ALWAYS">
+            <items>
+                <VBox spacing="12" styleClass="content-card">
+                    <children>
+                        <Label text="Історія цін" styleClass="section-title"/>
+
+                        <TableView fx:id="priceTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="idColumn" text="ID" prefWidth="70.0"/>
+                                <TableColumn fx:id="productIdColumn" text="Товар ID" prefWidth="110.0"/>
+                                <TableColumn fx:id="amountColumn" text="Закупівельна" prefWidth="130.0"/>
+                                <TableColumn fx:id="retailPriceColumn" text="Роздрібна" prefWidth="130.0"/>
+                                <TableColumn fx:id="validFromColumn" text="Діє з" prefWidth="170.0"/>
+                                <TableColumn fx:id="validToColumn" text="Діє до" prefWidth="170.0"/>
+                            </columns>
+                        </TableView>
+                    </children>
+                </VBox>
+
+                <VBox spacing="12" styleClass="content-card">
+                    <children>
+                        <Label text="Додати / редагувати ціну" styleClass="section-title"/>
+
+                        <Label text="Товар ID"/>
+                        <TextField fx:id="productIdField" promptText="Наприклад: 1"/>
+
+                        <Label text="Закупівельна ціна"/>
+                        <TextField fx:id="amountField" promptText="100.00"/>
+
+                        <Label text="Роздрібна ціна"/>
+                        <TextField fx:id="retailPriceField" promptText="150.00"/>
+
+                        <Label text="Діє до"/>
+                        <TextField fx:id="validToField" promptText="дд.ММ.рррр гг:хх, необов'язково"/>
+
+                        <HBox spacing="10">
+                            <children>
+                                <Button text="Зберегти" onAction="#handleSave" styleClass="primary-button"/>
+                                <Button text="Очистити" onAction="#handleClear" styleClass="secondary-button"/>
+                                <Button text="Видалити" onAction="#handleDelete" styleClass="danger-button"/>
+                            </children>
+                        </HBox>
+
+                        <Label fx:id="statusLabel" text="Статус" styleClass="status-label"/>
+                    </children>
+                </VBox>
+            </items>
+        </SplitPane>
+    </children>
+</VBox>
