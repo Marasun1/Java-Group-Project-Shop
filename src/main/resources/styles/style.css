@@ -46,7 +46,7 @@
     -fx-background-color: #1f2937;
 }
 
-#activeNavButton {
+.active-nav-button {
     -fx-background-color: #2563eb;
     -fx-text-fill: white;
 }
@@ -65,6 +65,14 @@
     -fx-font-size: 18px;
     -fx-font-weight: bold;
     -fx-text-fill: #111827;
+}
+
+.search-bar {
+    -fx-alignment: CENTER_LEFT;
+}
+
+.search-title {
+    -fx-font-weight: bold;
 }
 
 .content-card {

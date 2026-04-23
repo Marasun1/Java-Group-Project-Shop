@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.ComboBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox spacing="16" styleClass="content-area"
+      xmlns="http://javafx.com/javafx/25"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="com.store.controller.UsersController">
+    <padding>
+        <Insets top="18" right="18" bottom="18" left="18"/>
+    </padding>
+
+    <children>
+        <HBox spacing="12">
+            <children>
+                <Label text="Користувачі" styleClass="page-title"/>
+                <Region HBox.hgrow="ALWAYS"/>
+                <Button text="Оновити" onAction="#handleRefresh" styleClass="secondary-button"/>
+            </children>
+        </HBox>
+
+        <SplitPane dividerPositions="0.68" VBox.vgrow="ALWAYS">
+            <items>
+                <VBox spacing="12" styleClass="content-card">
+                    <children>
+                        <Label text="Список користувачів" styleClass="section-title"/>
+
+                        <TableView fx:id="userTable" VBox.vgrow="ALWAYS">
+                            <columns>
+                                <TableColumn fx:id="idColumn" text="ID" prefWidth="70.0"/>
+                                <TableColumn fx:id="roleNameColumn" text="Роль" prefWidth="110.0"/>
+                                <TableColumn fx:id="emailColumn" text="Email" prefWidth="220.0"/>
+                                <TableColumn fx:id="fullNameColumn" text="ПІБ" prefWidth="220.0"/>
+                                <TableColumn fx:id="activeColumn" text="Активний" prefWidth="100.0"/>
+                                <TableColumn fx:id="createdAtColumn" text="Створено" prefWidth="170.0"/>
+                            </columns>
+                        </TableView>
+                    </children>
+                </VBox>
+
+                <VBox spacing="12" styleClass="content-card">
+                    <children>
+                        <Label text="Додати / редагувати користувача" styleClass="section-title"/>
+
+                        <Label text="Роль"/>
+                        <ComboBox fx:id="roleComboBox" promptText="Обери роль"/>
+
+                        <Label text="Email"/>
+                        <TextField fx:id="emailField" promptText="user@example.com"/>
+
+                        <Label text="ПІБ"/>
+                        <TextField fx:id="fullNameField" promptText="Ім'я користувача"/>
+
+                        <Label text="Пароль"/>
+                        <TextField fx:id="passwordField" promptText="Новий пароль"/>
+
+                        <CheckBox fx:id="activeCheckBox" text="Активний"/>
+
+                        <HBox spacing="10">
+                            <children>
+                                <Button text="Зберегти" onAction="#handleSave" styleClass="primary-button"/>
+                                <Button text="Очистити" onAction="#handleClear" styleClass="secondary-button"/>
+                                <Button text="Видалити" onAction="#handleDelete" styleClass="danger-button"/>
+                            </children>
+                        </HBox>
+
+                        <Label fx:id="statusLabel" text="Статус" styleClass="status-label"/>
+                    </children>
+                </VBox>
+            </items>
+        </SplitPane>
+    </children>
+</VBox>
