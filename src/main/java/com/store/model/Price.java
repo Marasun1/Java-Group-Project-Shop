@@ -3,6 +3,10 @@ package com.store.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Модель ціни товару.
+ * Містить закупівельну та роздрібну ціну разом із періодом їх дії.
+ */
 public class Price {
     private Long id;
     private Long productId;

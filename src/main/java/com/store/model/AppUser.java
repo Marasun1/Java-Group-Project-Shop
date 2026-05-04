@@ -2,6 +2,10 @@ package com.store.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Модель користувача застосунку.
+ * Відповідає запису з таблиці {@code users} разом із назвою ролі.
+ */
 public class AppUser {
     private Long id;
     private Long roleId;

@@ -3,6 +3,10 @@ package com.store.model;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
+/**
+ * Модель надходження товару.
+ * Описує операцію приймання товару, що зберігається в таблиці {@code receipts}.
+ */
 public class Receipt {
     private Long id;
     private Long productId;

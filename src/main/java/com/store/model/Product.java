@@ -2,6 +2,10 @@ package com.store.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Модель товару, яку використовують інтерфейс і шар збереження даних.
+ * Відповідає запису в таблиці {@code products}.
+ */
 public class Product {
     private Long id;
     private String sku;

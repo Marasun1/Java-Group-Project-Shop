@@ -2,6 +2,10 @@ package com.store.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Модель залишку товару в конкретній локації.
+ * Відповідає запису в таблиці {@code quantities}.
+ */
 public class Quantity {
     private Long id;
     private Long productId;
