@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сервіс для CRUD-операцій із залишками товарів.
+ */
 public class QuantityService {
 
     private static final String SELECT_ALL_SQL = """
@@ -32,6 +35,11 @@ public class QuantityService {
             WHERE id = ?
             """;
 
+    /**
+     * Завантажує всі записи залишків.
+     *
+     * @return список залишків товарів
+     */
     public List<Quantity> getAllQuantities() {
         List<Quantity> quantities = new ArrayList<>();
 
@@ -49,6 +57,12 @@ public class QuantityService {
         }
     }
 
+    /**
+     * Створює новий запис залишку.
+     *
+     * @param quantity дані залишку для збереження
+     * @return збережений запис залишку із заповненими службовими полями
+     */
     public Quantity createQuantity(Quantity quantity) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
@@ -70,6 +84,12 @@ public class QuantityService {
         }
     }
 
+    /**
+     * Оновлює наявний запис залишку.
+     *
+     * @param quantity залишок з оновленими даними
+     * @return {@code true}, якщо запис було оновлено
+     */
     public boolean updateQuantity(Quantity quantity) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_SQL)) {
@@ -84,6 +104,12 @@ public class QuantityService {
         }
     }
 
+    /**
+     * Видаляє запис залишку за ідентифікатором.
+     *
+     * @param id ідентифікатор залишку
+     * @return {@code true}, якщо запис було видалено
+     */
     public boolean deleteQuantity(Long id) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_SQL)) {
@@ -95,6 +121,13 @@ public class QuantityService {
         }
     }
 
+    /**
+     * Перетворює поточний рядок {@link ResultSet} у модель залишку.
+     *
+     * @param resultSet джерело даних з SQL-запиту
+     * @return об'єкт залишку
+     * @throws SQLException якщо не вдалося прочитати значення з результату запиту
+     */
     private Quantity mapQuantity(ResultSet resultSet) throws SQLException {
         Quantity quantity = new Quantity();
         quantity.setId(resultSet.getLong("id"));
@@ -105,6 +138,12 @@ public class QuantityService {
         return quantity;
     }
 
+    /**
+     * Перетворює SQL-мітку часу у {@link LocalDateTime}.
+     *
+     * @param timestamp значення з бази даних
+     * @return дата й час або {@code null}, якщо значення відсутнє
+     */
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp != null ? timestamp.toLocalDateTime() : null;
     }

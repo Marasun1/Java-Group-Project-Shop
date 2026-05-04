@@ -7,6 +7,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сервіс для CRUD-операцій із користувачами застосунку та їхніми ролями.
+ */
 public class UserService {
 
     private static final String[] DEFAULT_ROLES = {"ADMIN", "MANAGER", "CLERK"};
@@ -49,6 +52,9 @@ public class UserService {
             WHERE id = ?
             """;
 
+    /**
+     * Гарантує наявність стандартних системних ролей у базі даних.
+     */
     public void ensureDefaultRoles() {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_ROLE_SQL)) {
@@ -65,6 +71,11 @@ public class UserService {
         }
     }
 
+    /**
+     * Завантажує всіх користувачів разом із назвами їхніх ролей.
+     *
+     * @return список користувачів
+     */
     public List<AppUser> getAllUsers() {
         List<AppUser> users = new ArrayList<>();
 
@@ -82,6 +93,12 @@ public class UserService {
         }
     }
 
+    /**
+     * Створює нового користувача застосунку.
+     *
+     * @param user дані користувача для збереження
+     * @return збережений користувач із заповненими службовими полями
+     */
     public AppUser createUser(AppUser user) {
         Long roleId = getRoleId(user.getRoleName());
 
@@ -108,6 +125,12 @@ public class UserService {
         }
     }
 
+    /**
+     * Оновлює наявного користувача.
+     *
+     * @param user користувач з оновленими даними
+     * @return {@code true}, якщо запис було оновлено
+     */
     public boolean updateUser(AppUser user) {
         Long roleId = getRoleId(user.getRoleName());
 
@@ -126,6 +149,12 @@ public class UserService {
         }
     }
 
+    /**
+     * Видаляє користувача за ідентифікатором.
+     *
+     * @param id ідентифікатор користувача
+     * @return {@code true}, якщо користувача було видалено
+     */
     public boolean deleteUser(Long id) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_SQL)) {
@@ -137,6 +166,13 @@ public class UserService {
         }
     }
 
+    /**
+     * Знаходить ідентифікатор ролі за її назвою.
+     * Перед пошуком переконується, що стандартні ролі вже існують.
+     *
+     * @param roleName назва ролі
+     * @return ідентифікатор ролі
+     */
     private Long getRoleId(String roleName) {
         ensureDefaultRoles();
 
@@ -157,6 +193,13 @@ public class UserService {
         }
     }
 
+    /**
+     * Перетворює поточний рядок {@link ResultSet} у модель користувача.
+     *
+     * @param resultSet джерело даних з SQL-запиту
+     * @return об'єкт користувача
+     * @throws SQLException якщо не вдалося прочитати значення з результату запиту
+     */
     private AppUser mapUser(ResultSet resultSet) throws SQLException {
         AppUser user = new AppUser();
         user.setId(resultSet.getLong("id"));
@@ -170,6 +213,12 @@ public class UserService {
         return user;
     }
 
+    /**
+     * Перетворює SQL-мітку часу у {@link LocalDateTime}.
+     *
+     * @param timestamp значення з бази даних
+     * @return дата й час або {@code null}, якщо значення відсутнє
+     */
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp != null ? timestamp.toLocalDateTime() : null;
     }

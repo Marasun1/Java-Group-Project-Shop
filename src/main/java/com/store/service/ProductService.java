@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Сервіс для CRUD-операцій і пошуку товарів.
+ */
 public class ProductService {
 
     private static final String SELECT_ALL_SQL = """
@@ -47,6 +50,11 @@ public class ProductService {
             WHERE id = ?
             """;
 
+    /**
+     * Завантажує всі товари, відсортовані за ідентифікатором.
+     *
+     * @return список усіх товарів
+     */
     public List<Product> getAllProducts() {
         List<Product> products = new ArrayList<>();
 
@@ -64,6 +72,12 @@ public class ProductService {
         }
     }
 
+    /**
+     * Шукає товар за його ідентифікатором.
+     *
+     * @param id ідентифікатор товару
+     * @return {@code Optional} з товаром або порожнє значення, якщо товар не знайдено
+     */
     public Optional<Product> getProductById(Long id) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(SELECT_BY_ID_SQL)) {
@@ -82,6 +96,13 @@ public class ProductService {
         }
     }
 
+    /**
+     * Виконує пошук товарів за SKU і/або назвою з частковим збігом.
+     *
+     * @param sku необов'язковий фрагмент SKU
+     * @param name необов'язковий фрагмент назви
+     * @return список знайдених товарів
+     */
     public List<Product> searchProducts(String sku, String name) {
         List<Product> products = new ArrayList<>();
         String skuFilter = normalizeFilter(sku);
@@ -107,6 +128,12 @@ public class ProductService {
         }
     }
 
+    /**
+     * Створює новий запис товару.
+     *
+     * @param product дані товару для збереження
+     * @return збережений товар із заповненими службовими полями
+     */
     public Product createProduct(Product product) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
@@ -129,6 +156,12 @@ public class ProductService {
         }
     }
 
+    /**
+     * Оновлює наявний товар.
+     *
+     * @param product товар з оновленими даними
+     * @return {@code true}, якщо було оновлено хоча б один рядок
+     */
     public boolean updateProduct(Product product) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_SQL)) {
@@ -144,6 +177,12 @@ public class ProductService {
         }
     }
 
+    /**
+     * Видаляє товар за ідентифікатором.
+     *
+     * @param id ідентифікатор товару
+     * @return {@code true}, якщо товар було видалено
+     */
     public boolean deleteProduct(Long id) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_SQL)) {
@@ -155,6 +194,13 @@ public class ProductService {
         }
     }
 
+    /**
+     * Перетворює поточний рядок {@link ResultSet} у модель товару.
+     *
+     * @param resultSet джерело даних з SQL-запиту
+     * @return об'єкт товару
+     * @throws SQLException якщо не вдалося прочитати значення з результату запиту
+     */
     private Product mapProduct(ResultSet resultSet) throws SQLException {
         Product product = new Product();
         product.setId(resultSet.getLong("id"));
@@ -166,11 +212,23 @@ public class ProductService {
         return product;
     }
 
+    /**
+     * Нормалізує значення для пошуку та додає шаблон для SQL {@code ILIKE}.
+     *
+     * @param value сире значення з поля пошуку
+     * @return шаблон пошуку або {@code null}, якщо поле порожнє
+     */
     private String normalizeFilter(String value) {
         String trimmed = value != null ? value.trim() : "";
         return trimmed.isBlank() ? null : "%" + trimmed + "%";
     }
 
+    /**
+     * Перетворює SQL-мітку часу у {@link LocalDateTime}.
+     *
+     * @param timestamp значення з бази даних
+     * @return дата й час або {@code null}, якщо значення відсутнє
+     */
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp != null ? timestamp.toLocalDateTime() : null;
     }

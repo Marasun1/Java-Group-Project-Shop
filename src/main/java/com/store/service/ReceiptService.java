@@ -7,6 +7,10 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сервіс для роботи з надходженнями товару.
+ * Підтримує як просте створення надходження, так і транзакційне оновлення залишку.
+ */
 public class ReceiptService {
 
     private static final String SELECT_ALL_SQL = """
@@ -46,6 +50,11 @@ public class ReceiptService {
             WHERE id = ?
             """;
 
+    /**
+     * Завантажує всі записи надходжень.
+     *
+     * @return список надходжень
+     */
     public List<Receipt> getAllReceipts() {
         List<Receipt> receipts = new ArrayList<>();
 
@@ -63,6 +72,12 @@ public class ReceiptService {
         }
     }
 
+    /**
+     * Створює новий запис надходження без зміни залишків.
+     *
+     * @param receipt дані надходження для збереження
+     * @return збережене надходження із заповненими службовими полями
+     */
     public Receipt createReceipt(Receipt receipt) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
@@ -86,6 +101,15 @@ public class ReceiptService {
         }
     }
 
+    /**
+     * Створює надходження та оновлює залишок в межах однієї транзакції.
+     * Якщо запис залишку для цього товару й локації вже існує,
+     * його кількість збільшується; інакше створюється новий рядок.
+     *
+     * @param receipt дані надходження для збереження
+     * @param location локація, куди надходить товар
+     * @return збережене надходження із заповненими службовими полями
+     */
     public Receipt createReceiptAndAddStock(Receipt receipt, String location) {
         try (Connection connection = DatabaseService.getConnection()) {
             connection.setAutoCommit(false);
@@ -107,6 +131,12 @@ public class ReceiptService {
         }
     }
 
+    /**
+     * Видаляє надходження за ідентифікатором.
+     *
+     * @param id ідентифікатор надходження
+     * @return {@code true}, якщо надходження було видалено
+     */
     public boolean deleteReceipt(Long id) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_SQL)) {
@@ -118,6 +148,13 @@ public class ReceiptService {
         }
     }
 
+    /**
+     * Перетворює поточний рядок {@link ResultSet} у модель надходження.
+     *
+     * @param resultSet джерело даних з SQL-запиту
+     * @return об'єкт надходження
+     * @throws SQLException якщо не вдалося прочитати значення з результату запиту
+     */
     private Receipt mapReceipt(ResultSet resultSet) throws SQLException {
         Receipt receipt = new Receipt();
         receipt.setId(resultSet.getLong("id"));
@@ -130,6 +167,14 @@ public class ReceiptService {
         return receipt;
     }
 
+    /**
+     * Виконує вставку надходження в межах уже відкритої транзакції.
+     *
+     * @param connection відкрите підключення до бази даних
+     * @param receipt дані надходження
+     * @return збережене надходження із заповненими службовими полями
+     * @throws SQLException якщо вставка не вдалася
+     */
     private Receipt insertReceipt(Connection connection, Receipt receipt) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
             statement.setLong(1, receipt.getProductId());
@@ -149,6 +194,16 @@ public class ReceiptService {
         return receipt;
     }
 
+    /**
+     * Додає кількість товару до залишку в заданій локації.
+     * Якщо запис уже існує, кількість збільшується; якщо ні - створюється новий.
+     *
+     * @param connection відкрите підключення до бази даних
+     * @param productId ідентифікатор товару
+     * @param location локація зберігання
+     * @param qty кількість для додавання
+     * @throws SQLException якщо операцію не вдалося виконати
+     */
     private void addQuantity(Connection connection, Long productId, String location, Long qty) throws SQLException {
         Long quantityId = null;
 
@@ -179,6 +234,12 @@ public class ReceiptService {
         }
     }
 
+    /**
+     * Перетворює SQL-мітку часу у {@link LocalDateTime}.
+     *
+     * @param timestamp значення з бази даних
+     * @return дата й час або {@code null}, якщо значення відсутнє
+     */
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp != null ? timestamp.toLocalDateTime() : null;
     }

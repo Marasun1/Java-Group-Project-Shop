@@ -7,6 +7,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Properties;
 
+/**
+ * Надає JDBC-підключення до бази даних PostgreSQL.
+ * Параметри з'єднання один раз зчитуються з файлу {@code db.properties}.
+ */
 public class DatabaseService {
 
     private static final String PROPERTIES_FILE = "db.properties";
@@ -30,6 +34,12 @@ public class DatabaseService {
     private DatabaseService() {
     }
 
+    /**
+     * Відкриває нове JDBC-підключення з використанням налаштувань бази даних.
+     *
+     * @return відкрите підключення до бази даних
+     * @throws SQLException якщо підключення не вдалося створити
+     */
     public static Connection getConnection() throws SQLException {
         String url = properties.getProperty("db.url");
         String username = properties.getProperty("db.username");
