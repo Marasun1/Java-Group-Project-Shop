@@ -19,6 +19,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Контролер сторінки надходжень.
+ * Створює записи надходжень і оновлює таблицю прийнятого товару.
+ */
 public class ReceiptsController {
 
     @FXML private TableView<Receipt> receiptTable;
@@ -112,6 +116,9 @@ public class ReceiptsController {
         clearForm();
     }
 
+    /**
+     * Завантажує всі надходження з бази даних у таблицю.
+     */
     private void loadReceipts() {
         try {
             List<Receipt> receipts = receiptService.getAllReceipts();
@@ -123,6 +130,9 @@ public class ReceiptsController {
         }
     }
 
+    /**
+     * Очищає форму створення надходження та скидає вибір у таблиці.
+     */
     private void clearForm() {
         productIdField.clear();
         userIdField.clear();
@@ -134,6 +144,11 @@ public class ReceiptsController {
         statusLabel.setText("Режим: додавання нового надходження");
     }
 
+    /**
+     * Налаштовує відображення дати й часу в таблиці надходжень.
+     *
+     * @param column колонка таблиці з датою
+     */
     private void configureDateColumn(TableColumn<Receipt, LocalDateTime> column) {
         column.setCellFactory(col -> new TableCell<>() {
             @Override

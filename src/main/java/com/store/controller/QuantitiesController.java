@@ -18,6 +18,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Контролер сторінки залишків.
+ * Працює із записами кількості товару по локаціях.
+ */
 public class QuantitiesController {
 
     @FXML private TableView<Quantity> quantityTable;
@@ -112,6 +116,9 @@ public class QuantitiesController {
         clearForm();
     }
 
+    /**
+     * Завантажує всі залишки з бази даних у таблицю.
+     */
     private void loadQuantities() {
         try {
             List<Quantity> quantities = quantityService.getAllQuantities();
@@ -123,6 +130,11 @@ public class QuantitiesController {
         }
     }
 
+    /**
+     * Підставляє дані вибраного залишку у форму для редагування.
+     *
+     * @param quantity вибраний запис залишку
+     */
     private void fillForm(Quantity quantity) {
         editingQuantityId = quantity.getId();
         productIdField.setText(String.valueOf(quantity.getProductId()));
@@ -131,6 +143,9 @@ public class QuantitiesController {
         statusLabel.setText("Режим: редагування залишку ID = " + quantity.getId());
     }
 
+    /**
+     * Очищає форму та скидає режим редагування залишку.
+     */
     private void clearForm() {
         editingQuantityId = null;
         productIdField.clear();
@@ -140,6 +155,11 @@ public class QuantitiesController {
         statusLabel.setText("Режим: додавання нового залишку");
     }
 
+    /**
+     * Налаштовує відображення значень дати й часу в таблиці.
+     *
+     * @param column колонка таблиці з датою
+     */
     private void configureDateColumn(TableColumn<Quantity, LocalDateTime> column) {
         column.setCellFactory(col -> new TableCell<>() {
             @Override

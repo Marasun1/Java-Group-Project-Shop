@@ -20,6 +20,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Контролер сторінки користувачів.
+ * Керує записами користувачів, ролями та перевіркою введених даних.
+ */
 public class UsersController {
 
     @FXML private TableView<AppUser> userTable;
@@ -130,6 +134,9 @@ public class UsersController {
         clearForm();
     }
 
+    /**
+     * Завантажує всіх користувачів з бази даних у таблицю.
+     */
     private void loadUsers() {
         try {
             List<AppUser> users = userService.getAllUsers();
@@ -141,6 +148,11 @@ public class UsersController {
         }
     }
 
+    /**
+     * Заповнює форму даними вибраного користувача для редагування.
+     *
+     * @param user вибраний користувач
+     */
     private void fillForm(AppUser user) {
         editingUserId = user.getId();
         roleComboBox.getSelectionModel().select(user.getRoleName());
@@ -151,6 +163,9 @@ public class UsersController {
         statusLabel.setText("Режим: редагування користувача ID = " + user.getId());
     }
 
+    /**
+     * Очищає форму користувача та повертає стандартні значення полів.
+     */
     private void clearForm() {
         editingUserId = null;
         roleComboBox.getSelectionModel().select("CLERK");
@@ -162,6 +177,11 @@ public class UsersController {
         statusLabel.setText("Режим: додавання нового користувача");
     }
 
+    /**
+     * Налаштовує відображення колонки з датою створення користувача.
+     *
+     * @param column колонка таблиці з датою
+     */
     private void configureDateColumn(TableColumn<AppUser, LocalDateTime> column) {
         column.setCellFactory(col -> new TableCell<>() {
             @Override
@@ -172,6 +192,12 @@ public class UsersController {
         });
     }
 
+    /**
+     * Перевіряє коректність пароля перед збереженням користувача.
+     *
+     * @param value введене значення пароля
+     * @return валідований пароль
+     */
     private String validatePassword(String value) {
         String password = ValidationUtil.required(value, "Пароль");
         if (password.length() < 4) {

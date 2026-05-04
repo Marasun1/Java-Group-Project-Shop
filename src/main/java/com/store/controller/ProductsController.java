@@ -19,6 +19,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Контролер сторінки товарів.
+ * Керує завантаженням, пошуком, створенням, редагуванням і видаленням товарів.
+ */
 public class ProductsController {
 
     @FXML
@@ -89,6 +93,11 @@ public class ProductsController {
         loadProducts();
     }
 
+    /**
+     * Налаштовує відображення колонки з датою та часом у читабельному форматі.
+     *
+     * @param column колонка таблиці з датою
+     */
     private void configureDateColumn(TableColumn<Product, LocalDateTime> column) {
         column.setCellFactory(col -> new TableCell<>() {
             @Override
@@ -205,6 +214,11 @@ public class ProductsController {
         clearForm();
     }
 
+    /**
+     * Заповнює форму даними вибраного товару для редагування.
+     *
+     * @param product вибраний товар
+     */
     private void fillForm(Product product) {
         editingProductId = product.getId();
         skuField.setText(product.getSku());
@@ -213,6 +227,9 @@ public class ProductsController {
         setStatus("Режим: редагування товару ID = " + product.getId());
     }
 
+    /**
+     * Очищає поля форми та скидає режим редагування.
+     */
     private void clearForm() {
         editingProductId = null;
         skuField.clear();
@@ -222,6 +239,9 @@ public class ProductsController {
         setStatus("Режим: додавання нового товару");
     }
 
+    /**
+     * Завантажує список товарів з бази даних у таблицю.
+     */
     private void loadProducts() {
         try {
             List<Product> products = productService.getAllProducts();
@@ -233,10 +253,18 @@ public class ProductsController {
         }
     }
 
+    /**
+     * Оновлює текст статусного рядка на сторінці.
+     *
+     * @param message текст статусу
+     */
     private void setStatus(String message) {
         statusLabel.setText(message);
     }
 
+    /**
+     * Очищає поля блоку пошуку товарів.
+     */
     private void clearSearchFields() {
         searchSkuField.clear();
         searchNameField.clear();

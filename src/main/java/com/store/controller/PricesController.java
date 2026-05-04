@@ -19,6 +19,10 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Контролер сторінки цін.
+ * Керує записами цін для товарів і синхронізує таблицю з базою даних.
+ */
 public class PricesController {
 
     @FXML private TableView<Price> priceTable;
@@ -118,6 +122,9 @@ public class PricesController {
         clearForm();
     }
 
+    /**
+     * Завантажує всі записи цін з бази даних у таблицю.
+     */
     private void loadPrices() {
         try {
             List<Price> prices = priceService.getAllPrices();
@@ -129,6 +136,11 @@ public class PricesController {
         }
     }
 
+    /**
+     * Заповнює форму даними вибраної ціни для редагування.
+     *
+     * @param price вибраний запис ціни
+     */
     private void fillForm(Price price) {
         editingPriceId = price.getId();
         productIdField.setText(String.valueOf(price.getProductId()));
@@ -138,6 +150,9 @@ public class PricesController {
         statusLabel.setText("Режим: редагування ціни ID = " + price.getId());
     }
 
+    /**
+     * Очищає форму ціни та скидає режим редагування.
+     */
     private void clearForm() {
         editingPriceId = null;
         productIdField.clear();
@@ -148,6 +163,11 @@ public class PricesController {
         statusLabel.setText("Режим: додавання нової ціни");
     }
 
+    /**
+     * Налаштовує відображення колонок з датою й часом.
+     *
+     * @param column колонка таблиці з датою
+     */
     private void configureDateColumn(TableColumn<Price, LocalDateTime> column) {
         column.setCellFactory(col -> new TableCell<>() {
             @Override

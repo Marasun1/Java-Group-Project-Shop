@@ -9,6 +9,10 @@ import javafx.scene.layout.BorderPane;
 
 import java.io.IOException;
 
+/**
+ * Контролер головної оболонки застосунку з боковою навігацією.
+ * Завантажує сторінки модулів у центральну частину основного макета.
+ */
 public class MainController {
 
     @FXML
@@ -59,6 +63,12 @@ public class MainController {
         loadPage("/fxml/users-view.fxml", usersButton);
     }
 
+    /**
+     * Завантажує сторінку за шляхом до FXML та активує відповідну кнопку меню.
+     *
+     * @param fxmlPath шлях до FXML-сторінки
+     * @param activeButton кнопка, яка має бути позначена як активна
+     */
     private void loadPage(String fxmlPath, Button activeButton) {
         try {
             Parent page = FXMLLoader.load(getClass().getResource(fxmlPath));
@@ -69,6 +79,11 @@ public class MainController {
         }
     }
 
+    /**
+     * Знімає активний стиль з усіх кнопок меню та встановлює його для вибраної.
+     *
+     * @param activeButton кнопка поточної сторінки
+     */
     private void setActiveButton(Button activeButton) {
         Button[] buttons = {
                 productsButton,
