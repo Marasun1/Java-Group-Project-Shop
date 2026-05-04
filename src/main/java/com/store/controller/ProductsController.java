@@ -3,12 +3,12 @@ package com.store.controller;
 import com.store.model.Product;
 import com.store.service.ProductService;
 import com.store.util.AlertUtil;
+import com.store.util.TableColumnUtil;
 import com.store.util.ValidationUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -79,8 +79,8 @@ public class ProductsController {
         createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
         updatedAtColumn.setCellValueFactory(new PropertyValueFactory<>("updatedAt"));
 
-        configureDateColumn(createdAtColumn);
-        configureDateColumn(updatedAtColumn);
+        TableColumnUtil.configureDateTimeColumn(createdAtColumn, formatter);
+        TableColumnUtil.configureDateTimeColumn(updatedAtColumn, formatter);
 
         productTable.setItems(productList);
 
@@ -91,26 +91,6 @@ public class ProductsController {
         });
 
         loadProducts();
-    }
-
-    /**
-     * Налаштовує відображення колонки з датою та часом у читабельному форматі.
-     *
-     * @param column колонка таблиці з датою
-     */
-    private void configureDateColumn(TableColumn<Product, LocalDateTime> column) {
-        column.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.format(formatter));
-                }
-            }
-        });
     }
 
     @FXML

@@ -3,12 +3,12 @@ package com.store.controller;
 import com.store.model.Receipt;
 import com.store.service.ReceiptService;
 import com.store.util.AlertUtil;
+import com.store.util.TableColumnUtil;
 import com.store.util.ValidationUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -54,7 +54,7 @@ public class ReceiptsController {
         wholesalePriceColumn.setCellValueFactory(new PropertyValueFactory<>("wholesalePrice"));
         receivedAtColumn.setCellValueFactory(new PropertyValueFactory<>("receivedAt"));
         noteColumn.setCellValueFactory(new PropertyValueFactory<>("note"));
-        configureDateColumn(receivedAtColumn);
+        TableColumnUtil.configureDateTimeColumn(receivedAtColumn, formatter);
 
         receiptTable.setItems(receiptList);
         loadReceipts();
@@ -144,18 +144,4 @@ public class ReceiptsController {
         statusLabel.setText("Режим: додавання нового надходження");
     }
 
-    /**
-     * Налаштовує відображення дати й часу в таблиці надходжень.
-     *
-     * @param column колонка таблиці з датою
-     */
-    private void configureDateColumn(TableColumn<Receipt, LocalDateTime> column) {
-        column.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.format(formatter));
-            }
-        });
-    }
 }

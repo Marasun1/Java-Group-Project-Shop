@@ -3,6 +3,7 @@ package com.store.controller;
 import com.store.model.AppUser;
 import com.store.service.UserService;
 import com.store.util.AlertUtil;
+import com.store.util.TableColumnUtil;
 import com.store.util.ValidationUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -10,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -57,7 +57,7 @@ public class UsersController {
         fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         activeColumn.setCellValueFactory(new PropertyValueFactory<>("active"));
         createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
-        configureDateColumn(createdAtColumn);
+        TableColumnUtil.configureDateTimeColumn(createdAtColumn, formatter);
 
         userTable.setItems(userList);
         userTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, user) -> {
@@ -175,21 +175,6 @@ public class UsersController {
         activeCheckBox.setSelected(true);
         userTable.getSelectionModel().clearSelection();
         statusLabel.setText("Режим: додавання нового користувача");
-    }
-
-    /**
-     * Налаштовує відображення колонки з датою створення користувача.
-     *
-     * @param column колонка таблиці з датою
-     */
-    private void configureDateColumn(TableColumn<AppUser, LocalDateTime> column) {
-        column.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.format(formatter));
-            }
-        });
     }
 
     /**

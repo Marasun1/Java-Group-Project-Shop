@@ -3,12 +3,12 @@ package com.store.controller;
 import com.store.model.Price;
 import com.store.service.PriceService;
 import com.store.util.AlertUtil;
+import com.store.util.TableColumnUtil;
 import com.store.util.ValidationUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -51,8 +51,8 @@ public class PricesController {
         retailPriceColumn.setCellValueFactory(new PropertyValueFactory<>("retailPrice"));
         validFromColumn.setCellValueFactory(new PropertyValueFactory<>("validFrom"));
         validToColumn.setCellValueFactory(new PropertyValueFactory<>("validTo"));
-        configureDateColumn(validFromColumn);
-        configureDateColumn(validToColumn);
+        TableColumnUtil.configureDateTimeColumn(validFromColumn, formatter);
+        TableColumnUtil.configureDateTimeColumn(validToColumn, formatter);
 
         priceTable.setItems(priceList);
         priceTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, price) -> {
@@ -163,18 +163,4 @@ public class PricesController {
         statusLabel.setText("Режим: додавання нової ціни");
     }
 
-    /**
-     * Налаштовує відображення колонок з датою й часом.
-     *
-     * @param column колонка таблиці з датою
-     */
-    private void configureDateColumn(TableColumn<Price, LocalDateTime> column) {
-        column.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.format(formatter));
-            }
-        });
-    }
 }

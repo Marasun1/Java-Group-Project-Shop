@@ -3,12 +3,12 @@ package com.store.controller;
 import com.store.model.Quantity;
 import com.store.service.QuantityService;
 import com.store.util.AlertUtil;
+import com.store.util.TableColumnUtil;
 import com.store.util.ValidationUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
@@ -47,7 +47,7 @@ public class QuantitiesController {
         locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
         qtyColumn.setCellValueFactory(new PropertyValueFactory<>("qty"));
         lastUpdatedColumn.setCellValueFactory(new PropertyValueFactory<>("lastUpdated"));
-        configureDateColumn(lastUpdatedColumn);
+        TableColumnUtil.configureDateTimeColumn(lastUpdatedColumn, formatter);
 
         quantityTable.setItems(quantityList);
         quantityTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, quantity) -> {
@@ -155,18 +155,4 @@ public class QuantitiesController {
         statusLabel.setText("Режим: додавання нового залишку");
     }
 
-    /**
-     * Налаштовує відображення значень дати й часу в таблиці.
-     *
-     * @param column колонка таблиці з датою
-     */
-    private void configureDateColumn(TableColumn<Quantity, LocalDateTime> column) {
-        column.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.format(formatter));
-            }
-        });
-    }
 }
