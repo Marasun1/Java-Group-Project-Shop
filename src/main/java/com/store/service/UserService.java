@@ -15,7 +15,7 @@ public class UserService {
     private static final String[] DEFAULT_ROLES = {"ADMIN", "MANAGER", "CLERK"};
 
     private static final String SELECT_ALL_SQL = """
-            SELECT u.id, u.role_id, r.name AS role_name, u.email, u.full_name,
+            SELECT u.id, u.role_id, r.name AS role_name, u.username, u.full_name,
                    u.password_hash, u.is_active, u.created_at
             FROM users u
             JOIN roles r ON r.id = u.role_id
@@ -35,14 +35,14 @@ public class UserService {
             """;
 
     private static final String INSERT_SQL = """
-            INSERT INTO users (role_id, email, full_name, password_hash, is_active, created_at, updated_at)
+            INSERT INTO users (role_id, username, full_name, password_hash, is_active, created_at, updated_at)
             VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             RETURNING id, created_at
             """;
 
     private static final String UPDATE_SQL = """
             UPDATE users
-            SET role_id = ?, email = ?, full_name = ?, password_hash = ?, is_active = ?,
+            SET role_id = ?, username = ?, full_name = ?, password_hash = ?, is_active = ?,
                 updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """;
@@ -106,7 +106,7 @@ public class UserService {
              PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
 
             statement.setLong(1, roleId);
-            statement.setString(2, user.getEmail());
+            statement.setString(2, user.getUsername());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getPasswordHash());
             statement.setBoolean(5, Boolean.TRUE.equals(user.getActive()));
@@ -121,7 +121,7 @@ public class UserService {
 
             return user;
         } catch (SQLException e) {
-            throw new RuntimeException("Не вдалося створити користувача. Перевір email на унікальність.", e);
+            throw new RuntimeException("Не вдалося створити користувача. Перевір username на унікальність.", e);
         }
     }
 
@@ -138,7 +138,7 @@ public class UserService {
              PreparedStatement statement = connection.prepareStatement(UPDATE_SQL)) {
 
             statement.setLong(1, roleId);
-            statement.setString(2, user.getEmail());
+            statement.setString(2, user.getUsername());
             statement.setString(3, user.getFullName());
             statement.setString(4, user.getPasswordHash());
             statement.setBoolean(5, Boolean.TRUE.equals(user.getActive()));
@@ -205,7 +205,7 @@ public class UserService {
         user.setId(resultSet.getLong("id"));
         user.setRoleId(resultSet.getLong("role_id"));
         user.setRoleName(resultSet.getString("role_name"));
-        user.setEmail(resultSet.getString("email"));
+        user.setUsername(resultSet.getString("username"));
         user.setFullName(resultSet.getString("full_name"));
         user.setPasswordHash(resultSet.getString("password_hash"));
         user.setActive(resultSet.getBoolean("is_active"));

@@ -28,9 +28,6 @@ public class MainController {
     private Button receiptsButton;
 
     @FXML
-    private Button pricesButton;
-
-    @FXML
     private Button usersButton;
 
     @FXML
@@ -51,11 +48,6 @@ public class MainController {
     @FXML
     private void showReceipts() {
         loadPage("/fxml/receipts-view.fxml", receiptsButton);
-    }
-
-    @FXML
-    private void showPrices() {
-        loadPage("/fxml/prices-view.fxml", pricesButton);
     }
 
     @FXML
@@ -89,7 +81,6 @@ public class MainController {
                 productsButton,
                 quantitiesButton,
                 receiptsButton,
-                pricesButton,
                 usersButton
         };
 

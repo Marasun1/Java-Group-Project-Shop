@@ -1,6 +1,7 @@
 package com.store.model;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -11,8 +12,12 @@ public class Receipt {
     private Long id;
     private Long productId;
     private Long userId;
-    private Long qtyReceived;
-    private BigDecimal wholesalePrice;
+    private Long roleId;
+    private String supplier;
+    private String invoiceNumber;
+    private BigDecimal qtyReceived;
+    private BigDecimal costPrice;
+    private LocalDate expiresAt;
     private LocalDateTime receivedAt;
     private String note;
 
@@ -40,20 +45,52 @@ public class Receipt {
         this.userId = userId;
     }
 
-    public Long getQtyReceived() {
+    public Long getRoleId() {
+        return roleId;
+    }
+
+    public void setRoleId(Long roleId) {
+        this.roleId = roleId;
+    }
+
+    public String getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(String supplier) {
+        this.supplier = supplier;
+    }
+
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public void setInvoiceNumber(String invoiceNumber) {
+        this.invoiceNumber = invoiceNumber;
+    }
+
+    public BigDecimal getQtyReceived() {
         return qtyReceived;
     }
 
-    public void setQtyReceived(Long qtyReceived) {
+    public void setQtyReceived(BigDecimal qtyReceived) {
         this.qtyReceived = qtyReceived;
     }
 
-    public BigDecimal getWholesalePrice() {
-        return wholesalePrice;
+    public BigDecimal getCostPrice() {
+        return costPrice;
     }
 
-    public void setWholesalePrice(BigDecimal wholesalePrice) {
-        this.wholesalePrice = wholesalePrice;
+    public void setCostPrice(BigDecimal costPrice) {
+        this.costPrice = costPrice;
+    }
+
+    public LocalDate getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(LocalDate expiresAt) {
+        this.expiresAt = expiresAt;
     }
 
     public LocalDateTime getReceivedAt() {

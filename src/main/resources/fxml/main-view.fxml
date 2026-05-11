@@ -39,8 +39,6 @@
                         onAction="#showQuantities" styleClass="nav-button"/>
                 <Button fx:id="receiptsButton" text="Надходження" prefWidth="160"
                         onAction="#showReceipts" styleClass="nav-button"/>
-                <Button fx:id="pricesButton" text="Ціни" prefWidth="160"
-                        onAction="#showPrices" styleClass="nav-button"/>
                 <Button fx:id="usersButton" text="Користувачі" prefWidth="160"
                         onAction="#showUsers" styleClass="nav-button"/>
             </children>

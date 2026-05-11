@@ -3,6 +3,7 @@ package com.store.util;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -28,6 +29,26 @@ public final class TableColumnUtil {
         column.setCellFactory(col -> new TableCell<>() {
             @Override
             protected void updateItem(LocalDateTime item, boolean empty) {
+                super.updateItem(item, empty);
+                setText(empty || item == null ? null : item.format(formatter));
+            }
+        });
+    }
+
+    /**
+     * Налаштовує колонку з датою для відображення значень у заданому форматі.
+     *
+     * @param column колонка таблиці з типом {@link LocalDate}
+     * @param formatter форматер для відображення значення
+     * @param <T> тип рядка таблиці
+     */
+    public static <T> void configureDateColumn(
+            TableColumn<T, LocalDate> column,
+            DateTimeFormatter formatter
+    ) {
+        column.setCellFactory(col -> new TableCell<>() {
+            @Override
+            protected void updateItem(LocalDate item, boolean empty) {
                 super.updateItem(item, empty);
                 setText(empty || item == null ? null : item.format(formatter));
             }

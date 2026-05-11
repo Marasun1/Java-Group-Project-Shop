@@ -17,7 +17,7 @@ class AppUserTest {
         user.setId(9L);
         user.setRoleId(1L);
         user.setRoleName("ADMIN");
-        user.setEmail("admin@example.com");
+        user.setUsername("admin");
         user.setFullName("Іван Петренко");
         user.setPasswordHash("secret123");
         user.setActive(true);
@@ -26,7 +26,7 @@ class AppUserTest {
         assertEquals(9L, user.getId());
         assertEquals(1L, user.getRoleId());
         assertEquals("ADMIN", user.getRoleName());
-        assertEquals("admin@example.com", user.getEmail());
+        assertEquals("admin", user.getUsername());
         assertEquals("Іван Петренко", user.getFullName());
         assertEquals("secret123", user.getPasswordHash());
         assertTrue(user.getActive());

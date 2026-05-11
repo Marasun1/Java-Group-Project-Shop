@@ -1,9 +1,10 @@
 package com.store.util;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.DateTimeFormatter;
 import java.util.regex.Pattern;
 
 /**
@@ -155,6 +156,27 @@ public class ValidationUtil {
             return LocalDateTime.parse(trimmed, formatter);
         } catch (DateTimeParseException e) {
             throw new IllegalArgumentException("Поле \"" + fieldName + "\" має формат дд.ММ.рррр гг:хх.");
+        }
+    }
+
+    /**
+     * Розбирає необов'язкове значення дати за переданим форматером.
+     *
+     * @param value сире значення дати
+     * @param fieldName назва поля для повідомлення про помилку
+     * @param formatter форматер для розбору значення
+     * @return розібрана дата або {@code null}, якщо поле порожнє
+     */
+    public static LocalDate optionalDate(String value, String fieldName, DateTimeFormatter formatter) {
+        String trimmed = optional(value);
+        if (trimmed.isBlank()) {
+            return null;
+        }
+
+        try {
+            return LocalDate.parse(trimmed, formatter);
+        } catch (DateTimeParseException e) {
+            throw new IllegalArgumentException("Поле \"" + fieldName + "\" має формат дд.ММ.рррр.");
         }
     }
 

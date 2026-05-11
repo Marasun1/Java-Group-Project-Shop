@@ -11,11 +11,13 @@ class ProductTest {
 
     @Test
     void constructorWithCoreFieldsSetsValues() {
-        Product product = new Product("SKU-101", "Ноутбук", "Опис");
+        Product product = new Product("SKU-101", "Ноутбук", "Опис", "Техніка", "шт");
 
         assertEquals("SKU-101", product.getSku());
         assertEquals("Ноутбук", product.getName());
         assertEquals("Опис", product.getDescription());
+        assertEquals("Техніка", product.getCategory());
+        assertEquals("шт", product.getUnit());
     }
 
     @Test
@@ -23,19 +25,21 @@ class ProductTest {
         LocalDateTime createdAt = LocalDateTime.of(2026, 5, 4, 10, 15);
         LocalDateTime updatedAt = LocalDateTime.of(2026, 5, 4, 12, 45);
 
-        Product product = new Product(7L, "SKU-777", "Монітор", "27 дюймів", createdAt, updatedAt);
+        Product product = new Product(7L, "SKU-777", "Монітор", "27 дюймів", "Техніка", "шт", createdAt, updatedAt);
 
         assertEquals(7L, product.getId());
         assertEquals("SKU-777", product.getSku());
         assertEquals("Монітор", product.getName());
         assertEquals("27 дюймів", product.getDescription());
+        assertEquals("Техніка", product.getCategory());
+        assertEquals("шт", product.getUnit());
         assertEquals(createdAt, product.getCreatedAt());
         assertEquals(updatedAt, product.getUpdatedAt());
     }
 
     @Test
     void toStringContainsKeyFields() {
-        Product product = new Product("SKU-202", "Клавіатура", "Механічна");
+        Product product = new Product("SKU-202", "Клавіатура", "Механічна", "Периферія", "шт");
         product.setId(3L);
 
         String result = product.toString();

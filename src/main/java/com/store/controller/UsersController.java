@@ -29,12 +29,12 @@ public class UsersController {
     @FXML private TableView<AppUser> userTable;
     @FXML private TableColumn<AppUser, Long> idColumn;
     @FXML private TableColumn<AppUser, String> roleNameColumn;
-    @FXML private TableColumn<AppUser, String> emailColumn;
+    @FXML private TableColumn<AppUser, String> usernameColumn;
     @FXML private TableColumn<AppUser, String> fullNameColumn;
     @FXML private TableColumn<AppUser, Boolean> activeColumn;
     @FXML private TableColumn<AppUser, LocalDateTime> createdAtColumn;
     @FXML private ComboBox<String> roleComboBox;
-    @FXML private TextField emailField;
+    @FXML private TextField usernameField;
     @FXML private TextField fullNameField;
     @FXML private TextField passwordField;
     @FXML private CheckBox activeCheckBox;
@@ -43,7 +43,7 @@ public class UsersController {
     private final UserService userService = new UserService();
     private final ObservableList<AppUser> userList = FXCollections.observableArrayList();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-    private Long editingUserId = null;
+    private Long editingUserId;
 
     @FXML
     private void initialize() {
@@ -53,7 +53,7 @@ public class UsersController {
 
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         roleNameColumn.setCellValueFactory(new PropertyValueFactory<>("roleName"));
-        emailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+        usernameColumn.setCellValueFactory(new PropertyValueFactory<>("username"));
         fullNameColumn.setCellValueFactory(new PropertyValueFactory<>("fullName"));
         activeColumn.setCellValueFactory(new PropertyValueFactory<>("active"));
         createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
@@ -81,7 +81,7 @@ public class UsersController {
             AppUser user = new AppUser();
             user.setId(editingUserId);
             user.setRoleName(ValidationUtil.required(roleComboBox.getValue(), "Роль"));
-            user.setEmail(ValidationUtil.requiredEmail(emailField.getText()));
+            user.setUsername(ValidationUtil.required(usernameField.getText(), "Username"));
             user.setFullName(ValidationUtil.required(fullNameField.getText(), "ПІБ"));
             user.setPasswordHash(validatePassword(passwordField.getText()));
             user.setActive(activeCheckBox.isSelected());
@@ -110,7 +110,7 @@ public class UsersController {
             return;
         }
 
-        if (!AlertUtil.showConfirmation("Підтвердження", "Видалити користувача " + selected.getEmail() + "?")) {
+        if (!AlertUtil.showConfirmation("Підтвердження", "Видалити користувача " + selected.getUsername() + "?")) {
             return;
         }
 
@@ -134,9 +134,6 @@ public class UsersController {
         clearForm();
     }
 
-    /**
-     * Завантажує всіх користувачів з бази даних у таблицю.
-     */
     private void loadUsers() {
         try {
             List<AppUser> users = userService.getAllUsers();
@@ -148,28 +145,20 @@ public class UsersController {
         }
     }
 
-    /**
-     * Заповнює форму даними вибраного користувача для редагування.
-     *
-     * @param user вибраний користувач
-     */
     private void fillForm(AppUser user) {
         editingUserId = user.getId();
         roleComboBox.getSelectionModel().select(user.getRoleName());
-        emailField.setText(user.getEmail());
+        usernameField.setText(user.getUsername());
         fullNameField.setText(user.getFullName());
         passwordField.setText(user.getPasswordHash());
         activeCheckBox.setSelected(Boolean.TRUE.equals(user.getActive()));
         statusLabel.setText("Режим: редагування користувача ID = " + user.getId());
     }
 
-    /**
-     * Очищає форму користувача та повертає стандартні значення полів.
-     */
     private void clearForm() {
         editingUserId = null;
         roleComboBox.getSelectionModel().select("CLERK");
-        emailField.clear();
+        usernameField.clear();
         fullNameField.clear();
         passwordField.clear();
         activeCheckBox.setSelected(true);
@@ -177,12 +166,6 @@ public class UsersController {
         statusLabel.setText("Режим: додавання нового користувача");
     }
 
-    /**
-     * Перевіряє коректність пароля перед збереженням користувача.
-     *
-     * @param value введене значення пароля
-     * @return валідований пароль
-     */
     private String validatePassword(String value) {
         String password = ValidationUtil.required(value, "Пароль");
         if (password.length() < 4) {

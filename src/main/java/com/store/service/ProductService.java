@@ -14,19 +14,19 @@ import java.util.Optional;
 public class ProductService {
 
     private static final String SELECT_ALL_SQL = """
-            SELECT id, sku, name, description, created_at, updated_at
+            SELECT id, sku, name, description, category, unit, created_at, updated_at
             FROM products
             ORDER BY id
             """;
 
     private static final String SELECT_BY_ID_SQL = """
-            SELECT id, sku, name, description, created_at, updated_at
+            SELECT id, sku, name, description, category, unit, created_at, updated_at
             FROM products
             WHERE id = ?
             """;
 
     private static final String SEARCH_SQL = """
-            SELECT id, sku, name, description, created_at, updated_at
+            SELECT id, sku, name, description, category, unit, created_at, updated_at
             FROM products
             WHERE (? IS NULL OR sku ILIKE ?)
               AND (? IS NULL OR name ILIKE ?)
@@ -34,14 +34,14 @@ public class ProductService {
             """;
 
     private static final String INSERT_SQL = """
-            INSERT INTO products (sku, name, description, created_at, updated_at)
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            INSERT INTO products (sku, name, description, category, unit, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             RETURNING id, created_at, updated_at
             """;
 
     private static final String UPDATE_SQL = """
             UPDATE products
-            SET sku = ?, name = ?, description = ?, updated_at = CURRENT_TIMESTAMP
+            SET sku = ?, name = ?, description = ?, category = ?, unit = ?, updated_at = CURRENT_TIMESTAMP
             WHERE id = ?
             """;
 
@@ -141,6 +141,8 @@ public class ProductService {
             statement.setString(1, product.getSku());
             statement.setString(2, product.getName());
             statement.setString(3, product.getDescription());
+            statement.setString(4, product.getCategory());
+            statement.setString(5, product.getUnit());
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -169,7 +171,9 @@ public class ProductService {
             statement.setString(1, product.getSku());
             statement.setString(2, product.getName());
             statement.setString(3, product.getDescription());
-            statement.setLong(4, product.getId());
+            statement.setString(4, product.getCategory());
+            statement.setString(5, product.getUnit());
+            statement.setLong(6, product.getId());
 
             return statement.executeUpdate() > 0;
         } catch (SQLException e) {
@@ -207,6 +211,8 @@ public class ProductService {
         product.setSku(resultSet.getString("sku"));
         product.setName(resultSet.getString("name"));
         product.setDescription(resultSet.getString("description"));
+        product.setCategory(resultSet.getString("category"));
+        product.setUnit(resultSet.getString("unit"));
         product.setCreatedAt(toLocalDateTime(resultSet.getTimestamp("created_at")));
         product.setUpdatedAt(toLocalDateTime(resultSet.getTimestamp("updated_at")));
         return product;

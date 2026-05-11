@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
@@ -38,8 +39,9 @@
                             <columns>
                                 <TableColumn fx:id="idColumn" text="ID" prefWidth="70.0"/>
                                 <TableColumn fx:id="productIdColumn" text="Товар ID" prefWidth="110.0"/>
-                                <TableColumn fx:id="locationColumn" text="Локація" prefWidth="220.0"/>
-                                <TableColumn fx:id="qtyColumn" text="Кількість" prefWidth="130.0"/>
+                                <TableColumn fx:id="locationColumn" text="Локація" prefWidth="170.0"/>
+                                <TableColumn fx:id="qtyColumn" text="Кількість" prefWidth="120.0"/>
+                                <TableColumn fx:id="expiresAtColumn" text="Придатний до" prefWidth="130.0"/>
                                 <TableColumn fx:id="lastUpdatedColumn" text="Оновлено" prefWidth="180.0"/>
                             </columns>
                         </TableView>
@@ -54,10 +56,13 @@
                         <TextField fx:id="productIdField" promptText="Наприклад: 1"/>
 
                         <Label text="Локація"/>
-                        <TextField fx:id="locationField" promptText="Склад A, полиця 3"/>
+                        <ComboBox fx:id="locationComboBox" promptText="Обери локацію"/>
 
                         <Label text="Кількість"/>
-                        <TextField fx:id="qtyField" promptText="0"/>
+                        <TextField fx:id="qtyField" promptText="0.000"/>
+
+                        <Label text="Придатний до"/>
+                        <TextField fx:id="expiresAtField" promptText="дд.ММ.рррр, необов'язково"/>
 
                         <HBox spacing="10">
                             <children>

@@ -3,6 +3,7 @@ package com.store.util;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -13,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 class ValidationUtilTest {
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
+    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     @Test
     void requiredReturnsTrimmedValue() {
@@ -150,5 +152,27 @@ class ValidationUtilTest {
         );
 
         assertEquals("Поле \"Діє до\" має формат дд.ММ.рррр гг:хх.", exception.getMessage());
+    }
+
+    @Test
+    void optionalDateReturnsNullForBlankValue() {
+        assertNull(ValidationUtil.optionalDate("   ", "Придатний до", DATE_FORMATTER));
+    }
+
+    @Test
+    void optionalDateParsesValidValue() {
+        LocalDate result = ValidationUtil.optionalDate("11.05.2026", "Придатний до", DATE_FORMATTER);
+
+        assertEquals(LocalDate.of(2026, 5, 11), result);
+    }
+
+    @Test
+    void optionalDateThrowsForInvalidFormat() {
+        IllegalArgumentException exception = assertThrows(
+                IllegalArgumentException.class,
+                () -> ValidationUtil.optionalDate("2026-05-11", "Придатний до", DATE_FORMATTER)
+        );
+
+        assertEquals("Поле \"Придатний до\" має формат дд.ММ.рррр.", exception.getMessage());
     }
 }

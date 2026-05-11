@@ -1,5 +1,7 @@
 package com.store.model;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 /**
@@ -10,7 +12,8 @@ public class Quantity {
     private Long id;
     private Long productId;
     private String location;
-    private Long qty;
+    private BigDecimal qty;
+    private LocalDate expiresAt;
     private LocalDateTime lastUpdated;
 
     public Long getId() {
@@ -37,12 +40,20 @@ public class Quantity {
         this.location = location;
     }
 
-    public Long getQty() {
+    public BigDecimal getQty() {
         return qty;
     }
 
-    public void setQty(Long qty) {
+    public void setQty(BigDecimal qty) {
         this.qty = qty;
+    }
+
+    public LocalDate getExpiresAt() {
+        return expiresAt;
+    }
+
+    public void setExpiresAt(LocalDate expiresAt) {
+        this.expiresAt = expiresAt;
     }
 
     public LocalDateTime getLastUpdated() {
