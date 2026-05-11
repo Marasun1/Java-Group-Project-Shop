@@ -24,6 +24,30 @@
 .sidebar {
     -fx-background-color: #111827;
     -fx-pref-width: 190;
+    -fx-min-height: 0;
+}
+
+.sidebar-scroll,
+.form-scroll {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.sidebar-scroll {
+    -fx-background-color: #111827;
+}
+
+.form-scroll > .viewport {
+    -fx-background-color: transparent;
+}
+
+.sidebar-scroll > .viewport {
+    -fx-background-color: #111827;
+}
+
+.form-scroll .content-card {
+    -fx-background-insets: 0;
 }
 
 .sidebar-title {

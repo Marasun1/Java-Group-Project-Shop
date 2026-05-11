@@ -3,6 +3,7 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
@@ -26,23 +27,27 @@
     </top>
 
     <left>
-        <VBox spacing="8" styleClass="sidebar">
-            <padding>
-                <Insets top="18" right="12" bottom="18" left="12"/>
-            </padding>
-            <children>
-                <Label text="Меню" styleClass="sidebar-title"/>
+        <ScrollPane fitToWidth="true" fitToHeight="true" hbarPolicy="NEVER" styleClass="sidebar-scroll">
+            <content>
+                <VBox spacing="8" styleClass="sidebar">
+                    <padding>
+                        <Insets top="18" right="12" bottom="18" left="12"/>
+                    </padding>
+                    <children>
+                        <Label text="Меню" styleClass="sidebar-title"/>
 
-                <Button fx:id="productsButton" text="Товари" prefWidth="160"
-                        onAction="#showProducts" styleClass="nav-button"/>
-                <Button fx:id="quantitiesButton" text="Залишки" prefWidth="160"
-                        onAction="#showQuantities" styleClass="nav-button"/>
-                <Button fx:id="receiptsButton" text="Надходження" prefWidth="160"
-                        onAction="#showReceipts" styleClass="nav-button"/>
-                <Button fx:id="usersButton" text="Користувачі" prefWidth="160"
-                        onAction="#showUsers" styleClass="nav-button"/>
-            </children>
-        </VBox>
+                        <Button fx:id="productsButton" text="Товари" prefWidth="160"
+                                onAction="#showProducts" styleClass="nav-button"/>
+                        <Button fx:id="quantitiesButton" text="Залишки" prefWidth="160"
+                                onAction="#showQuantities" styleClass="nav-button"/>
+                        <Button fx:id="receiptsButton" text="Надходження" prefWidth="160"
+                                onAction="#showReceipts" styleClass="nav-button"/>
+                        <Button fx:id="usersButton" text="Користувачі" prefWidth="160"
+                                onAction="#showUsers" styleClass="nav-button"/>
+                    </children>
+                </VBox>
+            </content>
+        </ScrollPane>
     </left>
 
 </BorderPane>

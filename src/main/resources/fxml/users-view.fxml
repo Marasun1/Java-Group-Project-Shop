@@ -5,6 +5,7 @@
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
@@ -49,35 +50,39 @@
                     </children>
                 </VBox>
 
-                <VBox spacing="12" styleClass="content-card">
-                    <children>
-                        <Label text="Додати / редагувати користувача" styleClass="section-title"/>
-
-                        <Label text="Роль"/>
-                        <ComboBox fx:id="roleComboBox" promptText="Обери роль"/>
-
-                        <Label text="Username"/>
-                        <TextField fx:id="usernameField" promptText="Наприклад: admin"/>
-
-                        <Label text="ПІБ"/>
-                        <TextField fx:id="fullNameField" promptText="Ім'я користувача"/>
-
-                        <Label text="Пароль"/>
-                        <TextField fx:id="passwordField" promptText="Новий пароль"/>
-
-                        <CheckBox fx:id="activeCheckBox" text="Активний"/>
-
-                        <HBox spacing="10">
+                <ScrollPane fitToWidth="true" hbarPolicy="NEVER" styleClass="form-scroll">
+                    <content>
+                        <VBox spacing="12" styleClass="content-card">
                             <children>
-                                <Button text="Зберегти" onAction="#handleSave" styleClass="primary-button"/>
-                                <Button text="Очистити" onAction="#handleClear" styleClass="secondary-button"/>
-                                <Button text="Видалити" onAction="#handleDelete" styleClass="danger-button"/>
-                            </children>
-                        </HBox>
+                                <Label text="Додати / редагувати користувача" styleClass="section-title"/>
 
-                        <Label fx:id="statusLabel" text="Статус" styleClass="status-label"/>
-                    </children>
-                </VBox>
+                                <Label text="Роль"/>
+                                <ComboBox fx:id="roleComboBox" promptText="Обери роль"/>
+
+                                <Label text="Username"/>
+                                <TextField fx:id="usernameField" promptText="Наприклад: admin"/>
+
+                                <Label text="ПІБ"/>
+                                <TextField fx:id="fullNameField" promptText="Ім'я користувача"/>
+
+                                <Label text="Пароль"/>
+                                <TextField fx:id="passwordField" promptText="Новий пароль"/>
+
+                                <CheckBox fx:id="activeCheckBox" text="Активний"/>
+
+                                <HBox spacing="10">
+                                    <children>
+                                        <Button text="Зберегти" onAction="#handleSave" styleClass="primary-button"/>
+                                        <Button text="Очистити" onAction="#handleClear" styleClass="secondary-button"/>
+                                        <Button text="Видалити" onAction="#handleDelete" styleClass="danger-button"/>
+                                    </children>
+                                </HBox>
+
+                                <Label fx:id="statusLabel" text="Статус" styleClass="status-label"/>
+                            </children>
+                        </VBox>
+                    </content>
+                </ScrollPane>
             </items>
         </SplitPane>
     </children>
