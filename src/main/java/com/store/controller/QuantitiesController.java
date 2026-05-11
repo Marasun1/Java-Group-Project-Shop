@@ -3,38 +3,48 @@ package com.store.controller;
 import com.store.model.Quantity;
 import com.store.service.QuantityService;
 import com.store.util.AlertUtil;
+import com.store.util.TableColumnUtil;
 import com.store.util.ValidationUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Контролер сторінки залишків.
+ * Працює із записами кількості товару по локаціях.
+ */
 public class QuantitiesController {
 
     @FXML private TableView<Quantity> quantityTable;
     @FXML private TableColumn<Quantity, Long> idColumn;
     @FXML private TableColumn<Quantity, Long> productIdColumn;
     @FXML private TableColumn<Quantity, String> locationColumn;
-    @FXML private TableColumn<Quantity, Long> qtyColumn;
+    @FXML private TableColumn<Quantity, BigDecimal> qtyColumn;
+    @FXML private TableColumn<Quantity, LocalDate> expiresAtColumn;
     @FXML private TableColumn<Quantity, LocalDateTime> lastUpdatedColumn;
     @FXML private TextField productIdField;
-    @FXML private TextField locationField;
+    @FXML private ComboBox<String> locationComboBox;
     @FXML private TextField qtyField;
+    @FXML private TextField expiresAtField;
     @FXML private Label statusLabel;
 
     private final QuantityService quantityService = new QuantityService();
     private final ObservableList<Quantity> quantityList = FXCollections.observableArrayList();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
-    private Long editingQuantityId = null;
+    private final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy");
+    private Long editingQuantityId;
 
     @FXML
     private void initialize() {
@@ -42,9 +52,13 @@ public class QuantitiesController {
         productIdColumn.setCellValueFactory(new PropertyValueFactory<>("productId"));
         locationColumn.setCellValueFactory(new PropertyValueFactory<>("location"));
         qtyColumn.setCellValueFactory(new PropertyValueFactory<>("qty"));
+        expiresAtColumn.setCellValueFactory(new PropertyValueFactory<>("expiresAt"));
         lastUpdatedColumn.setCellValueFactory(new PropertyValueFactory<>("lastUpdated"));
-        configureDateColumn(lastUpdatedColumn);
 
+        TableColumnUtil.configureDateColumn(expiresAtColumn, dateFormatter);
+        TableColumnUtil.configureDateTimeColumn(lastUpdatedColumn, formatter);
+
+        locationComboBox.getItems().setAll("MAIN_STORAGE", "REFRIGERATOR", "FREEZER", "DRY_STORAGE", "QUARANTINE");
         quantityTable.setItems(quantityList);
         quantityTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, quantity) -> {
             if (quantity != null) {
@@ -61,8 +75,9 @@ public class QuantitiesController {
             Quantity quantity = new Quantity();
             quantity.setId(editingQuantityId);
             quantity.setProductId(ValidationUtil.positiveLong(productIdField.getText(), "Товар ID"));
-            quantity.setLocation(ValidationUtil.required(locationField.getText(), "Локація"));
-            quantity.setQty(ValidationUtil.nonNegativeLong(qtyField.getText(), "Кількість"));
+            quantity.setLocation(ValidationUtil.required(locationComboBox.getValue(), "Локація"));
+            quantity.setQty(ValidationUtil.nonNegativeDecimal(qtyField.getText(), "Кількість"));
+            quantity.setExpiresAt(ValidationUtil.optionalDate(expiresAtField.getText(), "Придатний до", dateFormatter));
 
             if (editingQuantityId == null) {
                 quantityService.createQuantity(quantity);
@@ -112,6 +127,9 @@ public class QuantitiesController {
         clearForm();
     }
 
+    /**
+     * Завантажує всі залишки з бази даних у таблицю.
+     */
     private void loadQuantities() {
         try {
             List<Quantity> quantities = quantityService.getAllQuantities();
@@ -123,30 +141,30 @@ public class QuantitiesController {
         }
     }
 
+    /**
+     * Підставляє дані вибраного залишку у форму для редагування.
+     *
+     * @param quantity вибраний запис залишку
+     */
     private void fillForm(Quantity quantity) {
         editingQuantityId = quantity.getId();
         productIdField.setText(String.valueOf(quantity.getProductId()));
-        locationField.setText(quantity.getLocation());
+        locationComboBox.getSelectionModel().select(quantity.getLocation());
         qtyField.setText(String.valueOf(quantity.getQty()));
+        expiresAtField.setText(quantity.getExpiresAt() != null ? quantity.getExpiresAt().format(dateFormatter) : "");
         statusLabel.setText("Режим: редагування залишку ID = " + quantity.getId());
     }
 
+    /**
+     * Очищає форму залишку та скидає режим редагування.
+     */
     private void clearForm() {
         editingQuantityId = null;
         productIdField.clear();
-        locationField.clear();
+        locationComboBox.getSelectionModel().clearSelection();
         qtyField.clear();
+        expiresAtField.clear();
         quantityTable.getSelectionModel().clearSelection();
         statusLabel.setText("Режим: додавання нового залишку");
-    }
-
-    private void configureDateColumn(TableColumn<Quantity, LocalDateTime> column) {
-        column.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-                setText(empty || item == null ? null : item.format(formatter));
-            }
-        });
     }
 }

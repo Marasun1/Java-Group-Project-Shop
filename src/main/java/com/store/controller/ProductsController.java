@@ -3,12 +3,12 @@ package com.store.controller;
 import com.store.model.Product;
 import com.store.service.ProductService;
 import com.store.util.AlertUtil;
+import com.store.util.TableColumnUtil;
 import com.store.util.ValidationUtil;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
@@ -19,67 +19,51 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
+/**
+ * Контролер сторінки товарів.
+ * Керує завантаженням, пошуком, створенням, редагуванням і видаленням товарів.
+ */
 public class ProductsController {
 
-    @FXML
-    private TableView<Product> productTable;
-
-    @FXML
-    private TableColumn<Product, Long> idColumn;
-
-    @FXML
-    private TableColumn<Product, String> skuColumn;
-
-    @FXML
-    private TableColumn<Product, String> nameColumn;
-
-    @FXML
-    private TableColumn<Product, String> descriptionColumn;
-
-    @FXML
-    private TableColumn<Product, LocalDateTime> createdAtColumn;
-
-    @FXML
-    private TableColumn<Product, LocalDateTime> updatedAtColumn;
-
-    @FXML
-    private TextField skuField;
-
-    @FXML
-    private TextField nameField;
-
-    @FXML
-    private TextArea descriptionArea;
-
-    @FXML
-    private TextField searchSkuField;
-
-    @FXML
-    private TextField searchNameField;
-
-    @FXML
-    private Label statusLabel;
+    @FXML private TableView<Product> productTable;
+    @FXML private TableColumn<Product, Long> idColumn;
+    @FXML private TableColumn<Product, String> skuColumn;
+    @FXML private TableColumn<Product, String> nameColumn;
+    @FXML private TableColumn<Product, String> categoryColumn;
+    @FXML private TableColumn<Product, String> unitColumn;
+    @FXML private TableColumn<Product, String> descriptionColumn;
+    @FXML private TableColumn<Product, LocalDateTime> createdAtColumn;
+    @FXML private TableColumn<Product, LocalDateTime> updatedAtColumn;
+    @FXML private TextField skuField;
+    @FXML private TextField nameField;
+    @FXML private TextArea descriptionArea;
+    @FXML private TextField categoryField;
+    @FXML private TextField unitField;
+    @FXML private TextField searchSkuField;
+    @FXML private TextField searchNameField;
+    @FXML private Label statusLabel;
 
     private final ProductService productService = new ProductService();
     private final ObservableList<Product> productList = FXCollections.observableArrayList();
     private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
-    private Long editingProductId = null;
+    private Long editingProductId;
 
     @FXML
     private void initialize() {
         idColumn.setCellValueFactory(new PropertyValueFactory<>("id"));
         skuColumn.setCellValueFactory(new PropertyValueFactory<>("sku"));
         nameColumn.setCellValueFactory(new PropertyValueFactory<>("name"));
+        categoryColumn.setCellValueFactory(new PropertyValueFactory<>("category"));
+        unitColumn.setCellValueFactory(new PropertyValueFactory<>("unit"));
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
         createdAtColumn.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
         updatedAtColumn.setCellValueFactory(new PropertyValueFactory<>("updatedAt"));
 
-        configureDateColumn(createdAtColumn);
-        configureDateColumn(updatedAtColumn);
+        TableColumnUtil.configureDateTimeColumn(createdAtColumn, formatter);
+        TableColumnUtil.configureDateTimeColumn(updatedAtColumn, formatter);
 
         productTable.setItems(productList);
-
         productTable.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, selectedProduct) -> {
             if (selectedProduct != null) {
                 fillForm(selectedProduct);
@@ -89,30 +73,17 @@ public class ProductsController {
         loadProducts();
     }
 
-    private void configureDateColumn(TableColumn<Product, LocalDateTime> column) {
-        column.setCellFactory(col -> new TableCell<>() {
-            @Override
-            protected void updateItem(LocalDateTime item, boolean empty) {
-                super.updateItem(item, empty);
-
-                if (empty || item == null) {
-                    setText(null);
-                } else {
-                    setText(item.format(formatter));
-                }
-            }
-        });
-    }
-
     @FXML
     private void handleSave() {
         try {
             String sku = ValidationUtil.requiredSku(skuField.getText());
             String name = ValidationUtil.required(nameField.getText(), "Назва");
             String description = ValidationUtil.optional(descriptionArea.getText());
+            String category = ValidationUtil.required(categoryField.getText(), "Категорія");
+            String unit = ValidationUtil.required(unitField.getText(), "Одиниця виміру");
 
             if (editingProductId == null) {
-                Product newProduct = new Product(sku, name, description);
+                Product newProduct = new Product(sku, name, description, category, unit);
                 productService.createProduct(newProduct);
                 AlertUtil.showInfo("Успіх", "Товар успішно додано.");
             } else {
@@ -121,9 +92,10 @@ public class ProductsController {
                 updatedProduct.setSku(sku);
                 updatedProduct.setName(name);
                 updatedProduct.setDescription(description);
+                updatedProduct.setCategory(category);
+                updatedProduct.setUnit(unit);
 
                 boolean updated = productService.updateProduct(updatedProduct);
-
                 if (updated) {
                     AlertUtil.showInfo("Успіх", "Товар успішно оновлено.");
                 } else {
@@ -143,7 +115,6 @@ public class ProductsController {
     @FXML
     private void handleDelete() {
         Product selectedProduct = productTable.getSelectionModel().getSelectedItem();
-
         if (selectedProduct == null) {
             AlertUtil.showWarning("Видалення", "Спочатку вибери товар у таблиці.");
             return;
@@ -153,14 +124,12 @@ public class ProductsController {
                 "Підтвердження",
                 "Ти справді хочеш видалити товар: " + selectedProduct.getName() + "?"
         );
-
         if (!confirmed) {
             return;
         }
 
         try {
             boolean deleted = productService.deleteProduct(selectedProduct.getId());
-
             if (deleted) {
                 AlertUtil.showInfo("Успіх", "Товар видалено.");
                 loadProducts();
@@ -205,23 +174,38 @@ public class ProductsController {
         clearForm();
     }
 
+    /**
+     * Заповнює форму даними вибраного товару для редагування.
+     *
+     * @param product вибраний товар
+     */
     private void fillForm(Product product) {
         editingProductId = product.getId();
         skuField.setText(product.getSku());
         nameField.setText(product.getName());
         descriptionArea.setText(product.getDescription());
+        categoryField.setText(product.getCategory());
+        unitField.setText(product.getUnit());
         setStatus("Режим: редагування товару ID = " + product.getId());
     }
 
+    /**
+     * Очищає форму товару та скидає режим редагування.
+     */
     private void clearForm() {
         editingProductId = null;
         skuField.clear();
         nameField.clear();
         descriptionArea.clear();
+        categoryField.clear();
+        unitField.clear();
         productTable.getSelectionModel().clearSelection();
         setStatus("Режим: додавання нового товару");
     }
 
+    /**
+     * Завантажує список товарів з бази даних у таблицю.
+     */
     private void loadProducts() {
         try {
             List<Product> products = productService.getAllProducts();
@@ -233,10 +217,18 @@ public class ProductsController {
         }
     }
 
+    /**
+     * Оновлює текст статусного рядка на сторінці.
+     *
+     * @param message текст статусу
+     */
     private void setStatus(String message) {
         statusLabel.setText(message);
     }
 
+    /**
+     * Очищає поля блоку пошуку товарів.
+     */
     private void clearSearchFields() {
         searchSkuField.clear();
         searchNameField.clear();

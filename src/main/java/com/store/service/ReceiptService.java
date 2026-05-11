@@ -2,22 +2,34 @@ package com.store.service;
 
 import com.store.model.Receipt;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Сервіс для роботи з надходженнями товару.
+ * Підтримує як просте створення надходження, так і транзакційне оновлення залишку.
+ * У новій схемі надходження містить роль користувача, постачальника,
+ * номер накладної, собівартість і можливу дату придатності.
+ */
 public class ReceiptService {
 
     private static final String SELECT_ALL_SQL = """
-            SELECT id, product_id, user_id, qty_received, wholesale_price, received_at, note
+            SELECT id, product_id, user_id, role_id, supplier, invoice_number, qty_received,
+                   cost_price, expires_at, received_at, note
             FROM receipts
             ORDER BY id
             """;
 
     private static final String INSERT_SQL = """
-            INSERT INTO receipts (product_id, user_id, qty_received, wholesale_price, note)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO receipts (
+                product_id, user_id, role_id, supplier, invoice_number,
+                qty_received, cost_price, expires_at, note
+            )
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             RETURNING id, received_at
             """;
 
@@ -38,7 +50,7 @@ public class ReceiptService {
 
     private static final String INSERT_QUANTITY_SQL = """
             INSERT INTO quantities (product_id, location, qty, last_updated)
-            VALUES (?, ?, ?, CURRENT_TIMESTAMP)
+            VALUES (?, ?::location_type, ?, CURRENT_TIMESTAMP)
             """;
 
     private static final String DELETE_SQL = """
@@ -46,6 +58,11 @@ public class ReceiptService {
             WHERE id = ?
             """;
 
+    /**
+     * Завантажує всі записи надходжень.
+     *
+     * @return список надходжень
+     */
     public List<Receipt> getAllReceipts() {
         List<Receipt> receipts = new ArrayList<>();
 
@@ -63,15 +80,25 @@ public class ReceiptService {
         }
     }
 
+    /**
+     * Створює новий запис надходження без зміни залишків.
+     *
+     * @param receipt дані надходження для збереження
+     * @return збережене надходження із заповненими службовими полями
+     */
     public Receipt createReceipt(Receipt receipt) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
 
             statement.setLong(1, receipt.getProductId());
             statement.setLong(2, receipt.getUserId());
-            statement.setLong(3, receipt.getQtyReceived());
-            statement.setBigDecimal(4, receipt.getWholesalePrice());
-            statement.setString(5, receipt.getNote());
+            statement.setLong(3, receipt.getRoleId());
+            statement.setString(4, receipt.getSupplier());
+            statement.setString(5, receipt.getInvoiceNumber());
+            statement.setBigDecimal(6, receipt.getQtyReceived());
+            statement.setBigDecimal(7, receipt.getCostPrice());
+            setNullableDate(statement, 8, receipt.getExpiresAt());
+            statement.setString(9, receipt.getNote());
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -86,6 +113,15 @@ public class ReceiptService {
         }
     }
 
+    /**
+     * Створює надходження та оновлює залишок в межах однієї транзакції.
+     * Якщо запис залишку для цього товару й локації вже існує,
+     * його кількість збільшується; інакше створюється новий рядок.
+     *
+     * @param receipt дані надходження для збереження
+     * @param location локація, куди надходить товар
+     * @return збережене надходження із заповненими службовими полями
+     */
     public Receipt createReceiptAndAddStock(Receipt receipt, String location) {
         try (Connection connection = DatabaseService.getConnection()) {
             connection.setAutoCommit(false);
@@ -107,6 +143,12 @@ public class ReceiptService {
         }
     }
 
+    /**
+     * Видаляє надходження за ідентифікатором.
+     *
+     * @param id ідентифікатор надходження
+     * @return {@code true}, якщо надходження було видалено
+     */
     public boolean deleteReceipt(Long id) {
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(DELETE_SQL)) {
@@ -118,25 +160,48 @@ public class ReceiptService {
         }
     }
 
+    /**
+     * Перетворює поточний рядок {@link ResultSet} у модель надходження.
+     *
+     * @param resultSet джерело даних з SQL-запиту
+     * @return об'єкт надходження
+     * @throws SQLException якщо не вдалося прочитати значення з результату запиту
+     */
     private Receipt mapReceipt(ResultSet resultSet) throws SQLException {
         Receipt receipt = new Receipt();
         receipt.setId(resultSet.getLong("id"));
         receipt.setProductId(resultSet.getLong("product_id"));
         receipt.setUserId(resultSet.getLong("user_id"));
-        receipt.setQtyReceived(resultSet.getLong("qty_received"));
-        receipt.setWholesalePrice(resultSet.getBigDecimal("wholesale_price"));
+        receipt.setRoleId(resultSet.getLong("role_id"));
+        receipt.setSupplier(resultSet.getString("supplier"));
+        receipt.setInvoiceNumber(resultSet.getString("invoice_number"));
+        receipt.setQtyReceived(resultSet.getBigDecimal("qty_received"));
+        receipt.setCostPrice(resultSet.getBigDecimal("cost_price"));
+        receipt.setExpiresAt(toLocalDate(resultSet.getDate("expires_at")));
         receipt.setReceivedAt(toLocalDateTime(resultSet.getTimestamp("received_at")));
         receipt.setNote(resultSet.getString("note"));
         return receipt;
     }
 
+    /**
+     * Виконує вставку надходження в межах уже відкритої транзакції.
+     *
+     * @param connection відкрите підключення до бази даних
+     * @param receipt дані надходження
+     * @return збережене надходження із заповненими службовими полями
+     * @throws SQLException якщо вставка не вдалася
+     */
     private Receipt insertReceipt(Connection connection, Receipt receipt) throws SQLException {
         try (PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
             statement.setLong(1, receipt.getProductId());
             statement.setLong(2, receipt.getUserId());
-            statement.setLong(3, receipt.getQtyReceived());
-            statement.setBigDecimal(4, receipt.getWholesalePrice());
-            statement.setString(5, receipt.getNote());
+            statement.setLong(3, receipt.getRoleId());
+            statement.setString(4, receipt.getSupplier());
+            statement.setString(5, receipt.getInvoiceNumber());
+            statement.setBigDecimal(6, receipt.getQtyReceived());
+            statement.setBigDecimal(7, receipt.getCostPrice());
+            setNullableDate(statement, 8, receipt.getExpiresAt());
+            statement.setString(9, receipt.getNote());
 
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
@@ -149,7 +214,17 @@ public class ReceiptService {
         return receipt;
     }
 
-    private void addQuantity(Connection connection, Long productId, String location, Long qty) throws SQLException {
+    /**
+     * Додає кількість товару до залишку в заданій локації.
+     * Якщо запис уже існує, кількість збільшується; якщо ні - створюється новий.
+     *
+     * @param connection відкрите підключення до бази даних
+     * @param productId ідентифікатор товару
+     * @param location локація зберігання
+     * @param qty кількість для додавання
+     * @throws SQLException якщо операцію не вдалося виконати
+     */
+    private void addQuantity(Connection connection, Long productId, String location, BigDecimal qty) throws SQLException {
         Long quantityId = null;
 
         try (PreparedStatement statement = connection.prepareStatement(SELECT_QUANTITY_FOR_UPDATE_SQL)) {
@@ -167,18 +242,50 @@ public class ReceiptService {
             try (PreparedStatement statement = connection.prepareStatement(INSERT_QUANTITY_SQL)) {
                 statement.setLong(1, productId);
                 statement.setString(2, location);
-                statement.setLong(3, qty);
+                statement.setBigDecimal(3, qty);
                 statement.executeUpdate();
             }
         } else {
             try (PreparedStatement statement = connection.prepareStatement(UPDATE_QUANTITY_SQL)) {
-                statement.setLong(1, qty);
+                statement.setBigDecimal(1, qty);
                 statement.setLong(2, quantityId);
                 statement.executeUpdate();
             }
         }
     }
 
+    /**
+     * Записує в {@link PreparedStatement} дату придатності або {@code null}.
+     *
+     * @param statement підготовлений SQL-запит
+     * @param index позиція параметра
+     * @param value дата придатності
+     * @throws SQLException якщо параметр не вдалося встановити
+     */
+    private void setNullableDate(PreparedStatement statement, int index, LocalDate value) throws SQLException {
+        if (value == null) {
+            statement.setNull(index, Types.DATE);
+        } else {
+            statement.setDate(index, Date.valueOf(value));
+        }
+    }
+
+    /**
+     * Перетворює SQL-дату у {@link LocalDate}.
+     *
+     * @param date значення з бази даних
+     * @return дата або {@code null}, якщо значення відсутнє
+     */
+    private LocalDate toLocalDate(Date date) {
+        return date != null ? date.toLocalDate() : null;
+    }
+
+    /**
+     * Перетворює SQL-мітку часу у {@link LocalDateTime}.
+     *
+     * @param timestamp значення з бази даних
+     * @return дата й час або {@code null}, якщо значення відсутнє
+     */
     private LocalDateTime toLocalDateTime(Timestamp timestamp) {
         return timestamp != null ? timestamp.toLocalDateTime() : null;
     }

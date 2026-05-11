@@ -2,31 +2,42 @@ package com.store.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Модель товару, яку використовують інтерфейс і шар збереження даних.
+ * Відповідає запису в таблиці {@code products}, включно з категорією
+ * та одиницею виміру товару.
+ */
 public class Product {
     private Long id;
     private String sku;
     private String name;
     private String description;
+    private String category;
+    private String unit;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
     public Product() {
     }
 
-    public Product(Long id, String sku, String name, String description,
+    public Product(Long id, String sku, String name, String description, String category, String unit,
                    LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.id = id;
         this.sku = sku;
         this.name = name;
         this.description = description;
+        this.category = category;
+        this.unit = unit;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
 
-    public Product(String sku, String name, String description) {
+    public Product(String sku, String name, String description, String category, String unit) {
         this.sku = sku;
         this.name = name;
         this.description = description;
+        this.category = category;
+        this.unit = unit;
     }
 
     public Long getId() {
@@ -61,6 +72,22 @@ public class Product {
         this.description = description;
     }
 
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getUnit() {
+        return unit;
+    }
+
+    public void setUnit(String unit) {
+        this.unit = unit;
+    }
+
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
@@ -84,6 +111,8 @@ public class Product {
                 ", sku='" + sku + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", category='" + category + '\'' +
+                ", unit='" + unit + '\'' +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 '}';

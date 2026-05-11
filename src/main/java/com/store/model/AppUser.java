@@ -2,11 +2,16 @@ package com.store.model;
 
 import java.time.LocalDateTime;
 
+/**
+ * Модель користувача застосунку.
+ * Відповідає запису з таблиці {@code users} разом із назвою ролі.
+ * У новій схемі замість email використовується поле {@code username}.
+ */
 public class AppUser {
     private Long id;
     private Long roleId;
     private String roleName;
-    private String email;
+    private String username;
     private String fullName;
     private String passwordHash;
     private Boolean active;
@@ -36,12 +41,12 @@ public class AppUser {
         this.roleName = roleName;
     }
 
-    public String getEmail() {
-        return email;
+    public String getUsername() {
+        return username;
     }
 
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getFullName() {
