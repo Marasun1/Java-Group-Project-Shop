@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 /**
  * Модель користувача застосунку.
  * Відповідає запису з таблиці {@code users} разом із назвою ролі.
+ * У новій схемі замість email використовується поле {@code username}.
  */
 public class AppUser {
     private Long id;

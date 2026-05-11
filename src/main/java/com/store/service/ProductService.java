@@ -10,6 +10,7 @@ import java.util.Optional;
 
 /**
  * Сервіс для CRUD-операцій і пошуку товарів.
+ * Працює з новою схемою, де товар містить категорію та одиницю виміру.
  */
 public class ProductService {
 

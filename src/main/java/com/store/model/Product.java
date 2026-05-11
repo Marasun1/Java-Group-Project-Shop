@@ -4,7 +4,8 @@ import java.time.LocalDateTime;
 
 /**
  * Модель товару, яку використовують інтерфейс і шар збереження даних.
- * Відповідає запису в таблиці {@code products}.
+ * Відповідає запису в таблиці {@code products}, включно з категорією
+ * та одиницею виміру товару.
  */
 public class Product {
     private Long id;

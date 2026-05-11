@@ -134,6 +134,9 @@ public class UsersController {
         clearForm();
     }
 
+    /**
+     * Завантажує всіх користувачів з бази даних у таблицю.
+     */
     private void loadUsers() {
         try {
             List<AppUser> users = userService.getAllUsers();
@@ -145,6 +148,11 @@ public class UsersController {
         }
     }
 
+    /**
+     * Заповнює форму даними вибраного користувача для редагування.
+     *
+     * @param user вибраний користувач
+     */
     private void fillForm(AppUser user) {
         editingUserId = user.getId();
         roleComboBox.getSelectionModel().select(user.getRoleName());
@@ -155,6 +163,9 @@ public class UsersController {
         statusLabel.setText("Режим: редагування користувача ID = " + user.getId());
     }
 
+    /**
+     * Очищає форму користувача та повертає стандартні значення полів.
+     */
     private void clearForm() {
         editingUserId = null;
         roleComboBox.getSelectionModel().select("CLERK");
@@ -166,6 +177,12 @@ public class UsersController {
         statusLabel.setText("Режим: додавання нового користувача");
     }
 
+    /**
+     * Перевіряє коректність пароля перед збереженням користувача.
+     *
+     * @param value введене значення пароля
+     * @return валідований пароль
+     */
     private String validatePassword(String value) {
         String password = ValidationUtil.required(value, "Пароль");
         if (password.length() < 4) {

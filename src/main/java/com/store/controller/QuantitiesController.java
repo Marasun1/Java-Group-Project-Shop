@@ -127,6 +127,9 @@ public class QuantitiesController {
         clearForm();
     }
 
+    /**
+     * Завантажує всі залишки з бази даних у таблицю.
+     */
     private void loadQuantities() {
         try {
             List<Quantity> quantities = quantityService.getAllQuantities();
@@ -138,6 +141,11 @@ public class QuantitiesController {
         }
     }
 
+    /**
+     * Підставляє дані вибраного залишку у форму для редагування.
+     *
+     * @param quantity вибраний запис залишку
+     */
     private void fillForm(Quantity quantity) {
         editingQuantityId = quantity.getId();
         productIdField.setText(String.valueOf(quantity.getProductId()));
@@ -147,6 +155,9 @@ public class QuantitiesController {
         statusLabel.setText("Режим: редагування залишку ID = " + quantity.getId());
     }
 
+    /**
+     * Очищає форму залишку та скидає режим редагування.
+     */
     private void clearForm() {
         editingQuantityId = null;
         productIdField.clear();

@@ -6,7 +6,8 @@ import java.time.LocalDateTime;
 
 /**
  * Модель залишку товару в конкретній локації.
- * Відповідає запису в таблиці {@code quantities}.
+ * Відповідає запису в таблиці {@code quantities}, включно з кількістю,
+ * локацією зберігання та датою придатності.
  */
 public class Quantity {
     private Long id;

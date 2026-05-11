@@ -140,6 +140,9 @@ public class ReceiptsController {
         clearForm();
     }
 
+    /**
+     * Завантажує всі надходження з бази даних у таблицю.
+     */
     private void loadReceipts() {
         try {
             List<Receipt> receipts = receiptService.getAllReceipts();
@@ -151,6 +154,9 @@ public class ReceiptsController {
         }
     }
 
+    /**
+     * Очищає форму надходження та повертає значення полів за замовчуванням.
+     */
     private void clearForm() {
         productIdField.clear();
         userIdField.clear();
@@ -166,6 +172,13 @@ public class ReceiptsController {
         statusLabel.setText("Режим: додавання нового надходження");
     }
 
+    /**
+     * Перетворює назву ролі на ідентифікатор, який очікує таблиця {@code receipts}.
+     * Метод спирається на стандартні seed-дані ролей зі схеми БД.
+     *
+     * @param roleName назва ролі
+     * @return ідентифікатор ролі
+     */
     private Long resolveRoleId(String roleName) {
         return switch (roleName) {
             case "ADMIN" -> 1L;

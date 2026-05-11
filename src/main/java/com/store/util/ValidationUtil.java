@@ -65,7 +65,10 @@ public class ValidationUtil {
      *
      * @param value сире значення email
      * @return нормалізований email
+     * @deprecated у поточній схемі користувачі працюють через {@code username},
+     * але метод збережено для можливого перевикористання в інших формах
      */
+    @Deprecated
     public static String requiredEmail(String value) {
         String email = required(value, "Email");
         if (!EMAIL_PATTERN.matcher(email).matches()) {
