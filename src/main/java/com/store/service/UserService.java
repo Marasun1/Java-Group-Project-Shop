@@ -68,7 +68,7 @@ public class UserService {
 
             statement.executeBatch();
         } catch (SQLException e) {
-            throw new RuntimeException("Не вдалося підготувати ролі користувачів.", e);
+            throw new RuntimeException("Не вдалося підготувати ролі користувачів. " + e.getMessage(), e);
         }
     }
 
@@ -101,7 +101,7 @@ public class UserService {
      * @return збережений користувач із заповненими службовими полями
      */
     public AppUser createUser(AppUser user) {
-        Long roleId = getRoleId(user.getRoleName());
+        Long roleId = getRoleIdByName(user.getRoleName());
 
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(INSERT_SQL)) {
@@ -133,7 +133,7 @@ public class UserService {
      * @return {@code true}, якщо запис було оновлено
      */
     public boolean updateUser(AppUser user) {
-        Long roleId = getRoleId(user.getRoleName());
+        Long roleId = getRoleIdByName(user.getRoleName());
 
         try (Connection connection = DatabaseService.getConnection();
              PreparedStatement statement = connection.prepareStatement(UPDATE_SQL)) {
@@ -174,7 +174,7 @@ public class UserService {
      * @param roleName назва ролі
      * @return ідентифікатор ролі
      */
-    private Long getRoleId(String roleName) {
+    public Long getRoleIdByName(String roleName) {
         ensureDefaultRoles();
 
         try (Connection connection = DatabaseService.getConnection();
@@ -190,7 +190,7 @@ public class UserService {
 
             throw new RuntimeException("Роль не знайдено: " + roleName);
         } catch (SQLException e) {
-            throw new RuntimeException("Не вдалося отримати роль користувача.", e);
+            throw new RuntimeException("Не вдалося отримати роль користувача. " + e.getMessage(), e);
         }
     }
 
