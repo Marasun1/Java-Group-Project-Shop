@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html","k":"18"},{"l":"com.store"},{"l":"com.store.controller"},{"l":"com.store.model"},{"l":"com.store.service"},{"l":"com.store.util"}];updateSearchResults();

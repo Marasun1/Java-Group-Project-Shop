@@ -1,0 +1,25 @@
+--no-fonts
+-classpath
+'C:/Users/darkoni/.m2/repository/org/openjfx/javafx-controls/25/javafx-controls-25.jar;C:/Users/darkoni/.m2/repository/org/openjfx/javafx-controls/25/javafx-controls-25-win.jar;C:/Users/darkoni/.m2/repository/org/openjfx/javafx-graphics/25/javafx-graphics-25.jar;C:/Users/darkoni/.m2/repository/org/openjfx/javafx-graphics/25/javafx-graphics-25-win.jar;C:/Users/darkoni/.m2/repository/org/openjfx/javafx-base/25/javafx-base-25.jar;C:/Users/darkoni/.m2/repository/org/openjfx/javafx-base/25/javafx-base-25-win.jar;C:/Users/darkoni/.m2/repository/org/openjfx/javafx-fxml/25/javafx-fxml-25.jar;C:/Users/darkoni/.m2/repository/org/openjfx/javafx-fxml/25/javafx-fxml-25-win.jar;C:/Users/darkoni/.m2/repository/org/postgresql/postgresql/42.7.7/postgresql-42.7.7.jar'
+-encoding
+'UTF-8'
+-protected
+-source
+'25'
+-sourcepath
+'E:/project/warehouse-management-system/src/main/java'
+-author
+-bottom
+'Copyright &#169; 2026. All rights reserved.'
+-charset
+'UTF-8'
+-d
+'E:/project/warehouse-management-system/target/reports/apidocs'
+-docencoding
+'UTF-8'
+-doctitle
+'warehouse-management-system 1.0-SNAPSHOT API'
+-use
+-version
+-windowtitle
+'warehouse-management-system 1.0-SNAPSHOT API'
